@@ -8,6 +8,9 @@
 <meta name="apple-mobile-web-app-title" content="Lifts">
 <title>Lifts</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+
 <style>
 :root {
   --bg: #0a0a0c;
@@ -222,11 +225,32 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
 .dot-glutes{background:#ff9f7b;}
 .dot-core{background:#7bfff0;}
 .dot-calves{background:#aad4ff;}
+
+/* ML INSIGHTS */
+.ml-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;}
+.ml-card-title{font-family:Syne,sans-serif;font-size:13px;font-weight:800;color:var(--acc2);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.ml-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);}
+.ml-row:last-child{border-bottom:none;}
+.ml-label{font-size:11px;color:var(--muted2);flex:1;}
+.ml-value{font-family:Syne,sans-serif;font-size:13px;font-weight:800;}
+.ml-up{color:var(--acc);}
+.ml-down{color:var(--acc3);}
+.ml-neutral{color:var(--muted2);}
+.fatigue-wrap{display:flex;align-items:center;gap:8px;flex:1;justify-content:flex-end;}
+.fatigue-bar-bg{height:6px;background:var(--s3);border-radius:3px;width:80px;}
+.fatigue-bar{height:6px;border-radius:3px;}
+/* ALARM */
+#alarm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+#alarm-overlay.active{display:flex;}
+@keyframes pulse-alarm{from{transform:scale(1)}to{transform:scale(1.2)}}
+.alarm-icon{font-size:64px;animation:pulse-alarm .5s infinite alternate;}
+/* SWAP SESSION BTN */
+.sess-swap-btn{background:var(--s3);border:1px solid var(--border2);border-radius:6px;color:var(--muted2);font-size:9px;padding:3px 7px;cursor:pointer;margin-left:8px;font-family:DM Mono,monospace;vertical-align:middle;line-height:1;}
+/* RESUME BANNER */
+.resume-banner{background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
 <div id="login-screen" style="position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:16px;">
   <div style="font-family:Syne,sans-serif;font-size:32px;font-weight:900;letter-spacing:-2px;color:var(--acc);">LIFTS</div>
   <div style="font-size:11px;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;margin-top:-8px;">Historial sincronizado</div>
@@ -241,6 +265,12 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
     <button class="btn btn-ghost" onclick="skipLogin()" style="width:100%;font-size:12px;padding:10px;color:var(--muted2);">Usar sin cuenta (solo local)</button>
   </div>
   <div id="login-status" style="font-size:12px;color:var(--acc3);text-align:center;min-height:18px;"></div>
+</div>
+
+<div id="alarm-overlay">
+  <div class="alarm-icon">⏰</div>
+  <div style="font-family:Syne,sans-serif;font-size:22px;font-weight:900;color:var(--acc);letter-spacing:-1px;">¡Descanso terminado!</div>
+  <button class="btn btn-acc" onclick="dismissAlarm()" style="font-size:16px;padding:16px 40px;">¡Vamos! 💪</button>
 </div>
 
 <div class="app-shell">
@@ -313,7 +343,21 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
     <button class="nav-btn" onclick="switchPage('log')" id="nav-log">
       <span class="nav-icon">📋</span>History
     </button>
+    <button class="nav-btn" onclick="switchPage('ml')" id="nav-ml">
+      <span class="nav-icon">🧠</span>Insights
+    </button>
   </nav>
+</div>
+
+<!-- ML INSIGHTS PAGE -->
+<div class="page" id="page-ml">
+  <div class="slabel">Predicción de Progresión</div>
+  <div id="ml-prediction-content"><div style="text-align:center;padding:30px;color:var(--muted2);font-size:12px;">Completa algunos entrenos para ver predicciones.</div></div>
+  <div class="slabel" style="margin-top:16px;">Detección de Fatiga</div>
+  <div id="ml-fatigue-content"><div style="text-align:center;padding:30px;color:var(--muted2);font-size:12px;">Necesitas al menos 2 semanas de historial.</div></div>
+  <div class="slabel" style="margin-top:16px;">Recomendaciones</div>
+  <div id="ml-recommend-content"><div style="text-align:center;padding:30px;color:var(--muted2);font-size:12px;">Cargando...</div></div>
+  <button class="btn btn-ghost" onclick="switchPage('ml')" style="width:100%;margin-top:8px;font-size:12px;">🔄 Recalcular</button>
 </div>
 
 <!-- Exercise Picker Modal -->
@@ -329,18 +373,6 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
     </div>
   </div>
 </div>
-
-
-<!-- ALARM OVERLAY -->
-<div id="alarm-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:400;flex-direction:column;align-items:center;justify-content:center;gap:20px;">
-  <div style="font-size:56px;animation:pulse 0.6s infinite alternate;">⏰</div>
-  <div style="font-family:Syne,sans-serif;font-size:22px;font-weight:900;color:var(--acc);letter-spacing:-1px;">¡Descanso terminado!</div>
-  <button class="btn btn-acc" onclick="dismissAlarm()" style="font-size:16px;padding:16px 40px;">¡Vamos! 💪</button>
-</div>
-<style>
-#alarm-overlay.active { display:flex; }
-@keyframes pulse { from{transform:scale(1)} to{transform:scale(1.15)} }
-</style>
 
 <!-- Rest Timer -->
 <div class="timer-overlay" id="timer-overlay">
@@ -384,8 +416,8 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
     <button class="btn btn-ghost" style="width:100%;margin-top:12px;" onclick="closeSwapModal()">Cancel</button>
   </div>
 </div>
-
 <script>
+
 // ═══════════════════════════════════════
 // EXERCISE LIBRARY
 // ═══════════════════════════════════════
@@ -557,6 +589,7 @@ function switchPage(name) {
   if (name === 'log') renderLog();
   if (name === 'session' && routine.length > 0) requestWakeLock();
   else if (name !== 'session') releaseWakeLock();
+  if (name === 'ml') runMLInsights();
 }
 
 // ═══════════════════════════════════════
@@ -728,18 +761,19 @@ function renderSession() {
   let html = '';
   Object.entries(groups).forEach(([key, exs]) => {
     html += `<div class="slabel">${LIBRARY[key].label}</div>`;
-    exs.forEach(r => {
+    exs.forEach((r, rIdxLocal) => {
       const uid = key + '-' + r.exerciseId;
       const sets = sessionSets[uid] || [];
       const done = sets.filter(s => s.done).length;
-      html += buildExCard(r, uid, sets, done);
+      const rIdx = routine.findIndex(rx => rx.muscleKey === r.muscleKey && rx.exerciseId === r.exerciseId);
+      html += buildExCard(r, uid, sets, done, rIdx);
     });
   });
   html += `<button class="btn btn-acc" style="width:100%;margin-top:16px;" onclick="saveWorkout()">💾 Save Workout</button>`;
   cont.innerHTML = html;
 }
 
-function buildExCard(r, uid, sets, done) {
+function buildExCard(r, uid, sets, done, rIdx) {
   const last = getLastPerformance(r.name);
   const lastHint = last && last.weight ? `<div class="last-perf">Last: ${last.weight} lbs × ${last.reps} reps</div>` : '';
   return `
@@ -747,7 +781,7 @@ function buildExCard(r, uid, sets, done) {
     <div class="ex-card-hdr" onclick="toggleCard('${uid}')">
       <div class="ex-card-dot dot-${r.muscleKey}"></div>
       <div class="ex-card-info">
-        <div class="ex-card-name">${r.name}<button class="sess-swap-btn" onclick="event.stopPropagation();openSessionSwap(${routine.findIndex(rx=>rx.muscleKey===r.muscleKey&&rx.exerciseId===r.exerciseId)})" style="background:var(--s3);border:1px solid var(--border2);border-radius:6px;color:var(--muted2);font-size:9px;padding:3px 7px;cursor:pointer;margin-left:8px;font-family:DM Mono,monospace;">swap</button></div>
+        <div class="ex-card-name">${r.name}<button class="sess-swap-btn" onclick="event.stopPropagation();openSessionSwap(${rIdx})">swap</button></div>
         <div class="ex-card-sub">${r.sets} sets · ${r.reps} · ${fmtRest(r.rest)} rest</div>
         ${lastHint}
       </div>
@@ -823,27 +857,23 @@ function addSet(uid, muscleKey, exerciseId, rest, exName) {
 // SAVE WORKOUT
 // ═══════════════════════════════════════
 function saveWorkout() {
+  const workoutDate = new Date().toISOString();
   const exercises = routine.map(r => {
     const uid = r.muscleKey + '-' + r.exerciseId;
     const sets = (sessionSets[uid] || []).map(s => ({
-      weight: s.weight || '—',
-      reps: s.reps || '—',
-      done: s.done
+      weight: s.weight || '', reps: s.reps || '', done: s.done
     }));
-    return {name: r.name, muscleKey: r.muscleKey, sets};
+    return { name: r.name, muscleKey: r.muscleKey, exerciseId: r.exerciseId, sets };
   });
   const totalSets = exercises.reduce((a,e) => a + e.sets.filter(s => s.done).length, 0);
   if (totalSets === 0) { alert('Complete at least one set before saving.'); return; }
-  const entry = {
-    date: new Date().toISOString(),
-    exercises,
-    totalSets
-  };
+  const entry = { date: workoutDate, exercises, totalSets };
   try {
     const log = JSON.parse(localStorage.getItem('lifts-log') || '[]');
     log.unshift(entry);
-    localStorage.setItem('lifts-log', JSON.stringify(log.slice(0, 60)));
+    localStorage.setItem('lifts-log', JSON.stringify(log.slice(0, 90)));
   } catch(e) {}
+  saveWorkoutSets(exercises, workoutDate);
   stopTimer();
   clearSessionState();
   releaseWakeLock();
@@ -854,10 +884,98 @@ function saveWorkout() {
   switchPage('log');
 }
 
+async function saveWorkoutSets(exercises, workoutDate) {
+  if (!currentUser) return;
+  const rows = [];
+  exercises.forEach(ex => {
+    ex.sets.forEach((s, i) => {
+      if (!s.done) return;
+      rows.push({
+        user_id: currentUser.id,
+        exercise_id: ex.exerciseId,
+        exercise_name: ex.name,
+        muscle_key: ex.muscleKey,
+        workout_date: workoutDate,
+        set_number: i + 1,
+        weight: s.weight ? parseFloat(s.weight) : null,
+        reps: s.reps || null,
+        done: true
+      });
+    });
+  });
+  if (rows.length === 0) return;
+  const { error } = await sb.from('workout_sets').insert(rows);
+  if (error) console.error('workout_sets error:', error);
+}
+
 // ═══════════════════════════════════════
 // TIMER
 // ═══════════════════════════════════════
-// Timer functions defined below in the extras block
+let timerEndTime = 0;
+
+function startTimer(seconds, exName) {
+  stopTimer();
+  timerTotal = seconds; timerRemaining = seconds;
+  timerEndTime = Date.now() + seconds * 1000;
+  timerExName = exName;
+  document.getElementById('t-exname').textContent = exName;
+  document.getElementById('timer-overlay').classList.add('up');
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timerRemaining = Math.max(0, Math.round((timerEndTime - Date.now()) / 1000));
+    updateTimerDisplay();
+    if (timerRemaining <= 0) {
+      clearInterval(timerInterval); timerInterval = null;
+      triggerAlarm();
+    }
+  }, 500);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('t-num');
+  const ring = document.getElementById('t-ring-prog');
+  el.textContent = timerRemaining + 's';
+  const circ = 175.9;
+  const pct = timerTotal > 0 ? timerRemaining / timerTotal : 0;
+  ring.style.strokeDashoffset = circ * (1 - pct);
+  const urgent = timerRemaining <= 10 && timerRemaining > 0;
+  ring.style.stroke = urgent ? 'var(--acc3)' : 'var(--acc)';
+  el.style.color = urgent ? 'var(--acc3)' : 'var(--acc)';
+}
+
+function stopTimer() {
+  clearInterval(timerInterval); timerInterval = null;
+  document.getElementById('timer-overlay').classList.remove('up');
+}
+
+function skipTimer() { stopTimer(); }
+
+function adjustTimer(delta) {
+  timerEndTime += delta * 1000;
+  timerRemaining = Math.max(5, Math.round((timerEndTime - Date.now()) / 1000));
+  if (timerRemaining > timerTotal) timerTotal = timerRemaining;
+  updateTimerDisplay();
+}
+
+function triggerAlarm() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[880,0,.12],[880,.22,.12],[1100,.44,.18],[1320,.68,.35]].forEach(([f,t,d]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = f; o.type = 'sine';
+      g.gain.setValueAtTime(0, ctx.currentTime+t);
+      g.gain.linearRampToValueAtTime(0.5, ctx.currentTime+t+0.02);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime+t+d);
+      o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+d+0.05);
+    });
+  } catch(e) {}
+  document.getElementById('alarm-overlay').classList.add('active');
+}
+
+function dismissAlarm() {
+  document.getElementById('alarm-overlay').classList.remove('active');
+}
 
 // ═══════════════════════════════════════
 // LOG
@@ -1208,24 +1326,28 @@ function doSwap(reason) {
   if (sessionSwapTarget !== null) {
     const idx = sessionSwapTarget;
     const item = routine[idx];
-    if (reason === 'noequip' && !bannedExercises.includes(item.exerciseId)) {
+    if (reason === 'noequip' && item && !bannedExercises.includes(item.exerciseId)) {
       bannedExercises.push(item.exerciseId);
       try { localStorage.setItem('lifts-banned', JSON.stringify(bannedExercises)); } catch(e) {}
       renderBannedSection(); saveCloudState();
     }
-    const mxs = LIBRARY[item.muscleKey]?.exercises || [];
-    const used = routine.map(r => r.exerciseId);
-    const pool = mxs.filter(e => !used.includes(e.id) && !bannedExercises.includes(e.id));
-    if (pool.length > 0) {
-      const rep = pool[Math.floor(Math.random() * pool.length)];
-      const oldUid = item.muscleKey + '-' + item.exerciseId;
-      const newUid = item.muscleKey + '-' + rep.id;
-      const old = sessionSets[oldUid] || [];
-      sessionSets[newUid] = Array.from({length: item.sets}, (_, i) => ({
-        weight: old[i]?.weight || '', reps: old[i]?.reps || rep.reps, done: false
-      }));
-      delete sessionSets[oldUid];
-      routine[idx] = { muscleKey: item.muscleKey, exerciseId: rep.id, name: rep.name, sets: item.sets, reps: rep.reps, rest: rep.rest };
+    if (item) {
+      const mxs = (LIBRARY[item.muscleKey] && LIBRARY[item.muscleKey].exercises) || [];
+      const used = routine.map(r => r.exerciseId);
+      const pool = mxs.filter(e => !used.includes(e.id) && !bannedExercises.includes(e.id));
+      if (pool.length > 0) {
+        const rep = pool[Math.floor(Math.random() * pool.length)];
+        const oldUid = item.muscleKey + '-' + item.exerciseId;
+        const newUid = item.muscleKey + '-' + rep.id;
+        const old = sessionSets[oldUid] || [];
+        sessionSets[newUid] = Array.from({length: item.sets}, (_, i) => ({
+          weight: old[i] ? old[i].weight : '',
+          reps: old[i] ? old[i].reps : rep.reps,
+          done: false
+        }));
+        delete sessionSets[oldUid];
+        routine[idx] = { muscleKey: item.muscleKey, exerciseId: rep.id, name: rep.name, sets: item.sets, reps: rep.reps, rest: rep.rest };
+      }
     }
     sessionSwapTarget = null;
     closeSwapModal(); renderSession(); saveSessionState(); return;
@@ -1299,13 +1421,15 @@ function unbanExercise(id) {
   renderBannedSection();
 }
 
-// ═══════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════
 // SUPABASE AUTH + SYNC
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 const sb = supabase.createClient('https://ntdonecrulyxsduibhfc.supabase.co','sb_publishable_G67Ho1wMbW0jRhXV5TB6Lg_4hc-ddxK');
 let currentUser = null;
 let syncTimeout = null;
 let loginMode = 'login';
+let sessionSwapTarget = null;
 
 function showTab(mode) {
   loginMode = mode;
@@ -1407,9 +1531,9 @@ async function manualSync() {
   if (session?.user) { currentUser = session.user; onLoggedIn(); }
 })();
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // WAKE LOCK
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 let wakeLock = null;
 async function requestWakeLock() {
   if ('wakeLock' in navigator) { try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {} }
@@ -1421,9 +1545,9 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && routine.length > 0) requestWakeLock();
 });
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // SESSION PERSISTENCE
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 function saveSessionState() {
   if (!routine || routine.length === 0) return;
   try { localStorage.setItem('lifts-session', JSON.stringify({ routine, sessionSets, savedAt: Date.now() })); } catch(e) {}
@@ -1436,113 +1560,217 @@ function checkSavedSession() {
     const state = JSON.parse(raw);
     if (Date.now() - state.savedAt > 43200000) { clearSessionState(); return; }
     const banner = document.createElement('div');
-    banner.style.cssText = 'background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;';
+    banner.className = 'resume-banner';
     const encoded = encodeURIComponent(JSON.stringify(state));
     banner.innerHTML = '<div style="font-size:12px;color:var(--muted2);">⚡ Sesión sin guardar</div><div style="display:flex;gap:6px;"><button class="btn btn-ghost" style="font-size:11px;padding:6px 10px;" onclick="discardSaved(this)">Descartar</button><button class="btn btn-acc" style="font-size:11px;padding:6px 12px;" onclick="resumeSaved(this,\'' + encoded + '\')">Continuar ▶</button></div>';
     const sessionPage = document.getElementById('page-session');
-    sessionPage.insertBefore(banner, sessionPage.firstChild);
+    if (sessionPage) sessionPage.insertBefore(banner, sessionPage.firstChild);
   } catch(e) {}
 }
 function resumeSaved(btn, encoded) {
   try {
     const state = JSON.parse(decodeURIComponent(encoded));
     routine = state.routine; sessionSets = state.sessionSets;
-    clearSessionState(); btn.closest('div[style]').remove();
+    clearSessionState(); btn.closest('.resume-banner').remove();
     renderSession(); switchPage('session'); requestWakeLock();
   } catch(e) {}
 }
-function discardSaved(btn) { clearSessionState(); btn.closest('div[style]').remove(); }
+function discardSaved(btn) { clearSessionState(); btn.closest('.resume-banner').remove(); }
 
-// ═══════════════════════════════════════════════════════
-// TIMER BACKGROUND-SAFE + ALARMA
-// ═══════════════════════════════════════════════════════
-let timerEndTime = 0;
-
-function startTimer(seconds, exName) {
-  stopTimer();
-  timerTotal = seconds; timerRemaining = seconds;
-  timerEndTime = Date.now() + seconds * 1000;
-  timerExName = exName;
-  document.getElementById('t-exname').textContent = exName;
-  document.getElementById('timer-overlay').classList.add('up');
-  updateTimerDisplay();
-  timerInterval = setInterval(() => {
-    timerRemaining = Math.max(0, Math.round((timerEndTime - Date.now()) / 1000));
-    updateTimerDisplay();
-    if (timerRemaining <= 0) {
-      clearInterval(timerInterval); timerInterval = null;
-      triggerAlarm(timerExName);
-    }
-  }, 500);
-}
-
-function updateTimerDisplay() {
-  const el = document.getElementById('t-num');
-  const ring = document.getElementById('t-ring-prog');
-  el.textContent = timerRemaining + 's';
-  const circ = 175.9;
-  const pct = timerTotal > 0 ? timerRemaining / timerTotal : 0;
-  ring.style.strokeDashoffset = circ * (1 - pct);
-  const urgent = timerRemaining <= 10 && timerRemaining > 0;
-  ring.style.stroke = urgent ? 'var(--acc3)' : 'var(--acc)';
-  el.style.color = urgent ? 'var(--acc3)' : 'var(--acc)';
-}
-
-function stopTimer() {
-  clearInterval(timerInterval); timerInterval = null;
-  document.getElementById('timer-overlay').classList.remove('up');
-}
-
-function skipTimer() { stopTimer(); }
-
-function adjustTimer(delta) {
-  timerEndTime += delta * 1000;
-  timerRemaining = Math.max(5, Math.round((timerEndTime - Date.now()) / 1000));
-  if (timerRemaining > timerTotal) timerTotal = timerRemaining;
-  updateTimerDisplay();
-}
-
-function triggerAlarm(exName) {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    [[880,0,.12],[880,.2,.12],[1100,.4,.18],[1320,.65,.35]].forEach(([f,t,d]) => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.value = f; o.type = 'sine';
-      g.gain.setValueAtTime(0, ctx.currentTime+t);
-      g.gain.linearRampToValueAtTime(0.5, ctx.currentTime+t+0.02);
-      g.gain.linearRampToValueAtTime(0, ctx.currentTime+t+d);
-      o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+d+0.05);
-    });
-  } catch(e) {}
-  const overlay = document.getElementById('alarm-overlay');
-  if (overlay) overlay.classList.add('active');
-  document.getElementById('timer-overlay').classList.remove('up');
-}
-
-function dismissAlarm() {
-  const overlay = document.getElementById('alarm-overlay');
-  if (overlay) overlay.classList.remove('active');
-}
-
-// ═══════════════════════════════════════════════════════
-// SWAP EN SESIÓN
-// ═══════════════════════════════════════════════════════
-let sessionSwapTarget = null;
-
+// ═══════════════════════════════════════════
+// SESSION SWAP
+// ═══════════════════════════════════════════
 function openSessionSwap(rIdx) {
   sessionSwapTarget = rIdx;
-  document.getElementById('swap-modal-sub').textContent = 'Reemplazando: ' + routine[rIdx].name;
+  const item = routine[rIdx];
+  document.getElementById('swap-modal-sub').textContent = item ? 'Reemplazando: ' + item.name : '';
   document.getElementById('swap-modal-overlay').classList.add('open');
 }
 
-// ═══════════════════════════════════════════════════════
-// INIT EXTRAS
-// ═══════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  checkSavedSession();
-});
+
+// ═══════════════════════════════════════════
+// ML INSIGHTS (TensorFlow.js)
+// ═══════════════════════════════════════════
+
+async function runMLInsights() {
+  if (!currentUser) {
+    ['ml-prediction-content','ml-fatigue-content','ml-recommend-content'].forEach(id => {
+      document.getElementById(id).innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">Inicia sesión para ver tus insights.</div>';
+    });
+    return;
+  }
+
+  // Fetch last 90 days of workout_sets
+  const since = new Date(Date.now() - 90*24*60*60*1000).toISOString();
+  const { data: sets, error } = await sb
+    .from('workout_sets')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .gte('workout_date', since)
+    .order('workout_date', { ascending: true });
+
+  if (error || !sets || sets.length === 0) {
+    ['ml-prediction-content','ml-fatigue-content','ml-recommend-content'].forEach(id => {
+      document.getElementById(id).innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">Completa algunos entrenos para ver insights.</div>';
+    });
+    return;
+  }
+
+  await renderPredictions(sets);
+  renderFatigue(sets);
+  renderRecommendations(sets);
+}
+
+// ── PREDICCIÓN DE PESO ──
+async function renderPredictions(sets) {
+  // Agrupar por exercise_id → por fecha → max peso
+  const byExercise = {};
+  sets.forEach(s => {
+    if (!s.weight) return;
+    if (!byExercise[s.exercise_id]) byExercise[s.exercise_id] = { name: s.exercise_name, sessions: {} };
+    const day = s.workout_date.slice(0,10);
+    if (!byExercise[s.exercise_id].sessions[day] || byExercise[s.exercise_id].sessions[day] < s.weight) {
+      byExercise[s.exercise_id].sessions[day] = s.weight;
+    }
+  });
+
+  const predictions = [];
+  for (const [exId, data] of Object.entries(byExercise)) {
+    const days = Object.keys(data.sessions).sort();
+    if (days.length < 2) continue;
+    const weights = days.map(d => data.sessions[d]);
+    // Regresión lineal simple con TF.js
+    try {
+      const xs = tf.tensor1d(days.map((_, i) => i));
+      const ys = tf.tensor1d(weights.map(w => parseFloat(w)));
+      const xsMean = xs.mean();
+      const ysMean = ys.mean();
+      const num = xs.sub(xsMean).mul(ys.sub(ysMean)).sum();
+      const den = xs.sub(xsMean).square().sum();
+      const slope = num.div(den).dataSync()[0];
+      const intercept = ysMean.dataSync()[0] - slope * xsMean.dataSync()[0];
+      const nextX = days.length;
+      const predicted = slope * nextX + intercept;
+      const lastWeight = weights[weights.length - 1];
+      const diff = predicted - lastWeight;
+      predictions.push({ name: data.name, last: lastWeight, predicted: Math.max(0, predicted).toFixed(1), diff, sessions: days.length });
+      xs.dispose(); ys.dispose();
+    } catch(e) {}
+  }
+
+  const el = document.getElementById('ml-prediction-content');
+  if (predictions.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">Necesitas al menos 2 sesiones por ejercicio.</div>';
+    return;
+  }
+
+  // Mostrar top 6 ejercicios más recientes
+  const sorted = predictions.sort((a,b) => b.sessions - a.sessions).slice(0,6);
+  el.innerHTML = '<div class="ml-card"><div class="ml-card-title">📈 Próxima sesión estimada</div>' +
+    sorted.map(p => {
+      const sign = p.diff >= 0 ? '+' : '';
+      const cls = p.diff > 0.5 ? 'ml-up' : p.diff < -0.5 ? 'ml-down' : 'ml-neutral';
+      return `<div class="ml-row">
+        <div class="ml-label">${p.name}</div>
+        <div class="ml-value ${cls}">${p.predicted} kg <span style="font-size:10px;opacity:.7">(${sign}${p.diff.toFixed(1)})</span></div>
+      </div>`;
+    }).join('') + '</div>';
+}
+
+// ── DETECCIÓN DE FATIGA ──
+function renderFatigue(sets) {
+  // Para cada músculo, comparar volumen última semana vs media 4 semanas
+  const now = Date.now();
+  const week1 = now - 7*24*60*60*1000;
+  const week4 = now - 28*24*60*60*1000;
+
+  const byMuscle = {};
+  sets.forEach(s => {
+    if (!s.done) return;
+    const t = new Date(s.workout_date).getTime();
+    if (t < week4) return;
+    if (!byMuscle[s.muscle_key]) byMuscle[s.muscle_key] = { recent: 0, older: 0 };
+    if (t >= week1) byMuscle[s.muscle_key].recent++;
+    else byMuscle[s.muscle_key].older++;
+  });
+
+  const el = document.getElementById('ml-fatigue-content');
+  const muscles = Object.entries(byMuscle).filter(([k,v]) => v.older > 0 || v.recent > 0);
+  if (muscles.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">Necesitas más historial.</div>';
+    return;
+  }
+
+  const rows = muscles.map(([muscle, v]) => {
+    const avgPerWeek = v.older / 3; // media de las 3 semanas anteriores
+    const ratio = avgPerWeek > 0 ? v.recent / avgPerWeek : 1;
+    const pct = Math.min(100, Math.round(ratio * 100));
+    const barColor = ratio > 1.2 ? 'var(--acc3)' : ratio > 0.8 ? 'var(--acc)' : 'var(--muted)';
+    const label = ratio > 1.3 ? '⚠️ Alta carga' : ratio > 0.8 ? '✅ Normal' : '😴 Poco volumen';
+    const muscleName = LIBRARY[muscle] ? LIBRARY[muscle].label : muscle;
+    return `<div class="ml-row">
+      <div class="ml-label">${muscleName}</div>
+      <div class="fatigue-wrap">
+        <div class="fatigue-bar-bg"><div class="fatigue-bar" style="width:${pct}%;background:${barColor};"></div></div>
+        <div style="font-size:10px;color:var(--muted2);width:80px;text-align:right;">${label}</div>
+      </div>
+    </div>`;
+  });
+
+  el.innerHTML = '<div class="ml-card"><div class="ml-card-title">🔥 Carga por músculo (vs media 3 semanas)</div>' + rows.join('') + '</div>';
+}
+
+// ── RECOMENDACIONES ──
+function renderRecommendations(sets) {
+  // Qué músculos no has entrenado en los últimos 5 días
+  const recent5 = new Date(Date.now() - 5*24*60*60*1000).toISOString();
+  const recentMuscles = new Set(sets.filter(s => s.workout_date >= recent5).map(s => s.muscle_key));
+  const allMuscles = Object.keys(LIBRARY);
+  const rested = allMuscles.filter(m => !recentMuscles.has(m));
+
+  // Para cada músculo descansado, sugerir el ejercicio con mejor progresión
+  const byEx = {};
+  sets.forEach(s => {
+    if (!s.weight || !rested.includes(s.muscle_key)) return;
+    if (!byEx[s.exercise_id]) byEx[s.exercise_id] = { name: s.exercise_name, muscle: s.muscle_key, weights: [] };
+    byEx[s.exercise_id].weights.push(parseFloat(s.weight));
+  });
+
+  const suggestions = [];
+  rested.forEach(muscle => {
+    const exForMuscle = Object.entries(byEx).filter(([,v]) => v.muscle === muscle);
+    if (exForMuscle.length > 0) {
+      // Sugerir el que mayor progresión tiene
+      const best = exForMuscle.sort((a,b) => {
+        const wa = a[1].weights; const wb = b[1].weights;
+        const diffA = wa.length > 1 ? wa[wa.length-1] - wa[0] : 0;
+        const diffB = wb.length > 1 ? wb[wb.length-1] - wb[0] : 0;
+        return diffB - diffA;
+      })[0];
+      suggestions.push({ muscle, name: best[1].name, lastWeight: best[1].weights[best[1].weights.length-1] });
+    } else {
+      // Nunca entrenado o sin pesos — sugerir el primero de la librería no baneado
+      const libEx = (LIBRARY[muscle]?.exercises || []).filter(e => !bannedExercises.includes(e.id));
+      if (libEx.length > 0) suggestions.push({ muscle, name: libEx[0].name, lastWeight: null });
+    }
+  });
+
+  const el = document.getElementById('ml-recommend-content');
+  if (suggestions.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">Has entrenado todos los grupos recientemente. ¡Buen trabajo! 💪</div>';
+    return;
+  }
+
+  el.innerHTML = '<div class="ml-card"><div class="ml-card-title">💡 Músculos listos para entrenar</div>' +
+    suggestions.slice(0,6).map(s => {
+      const muscleName = LIBRARY[s.muscle] ? LIBRARY[s.muscle].label : s.muscle;
+      return `<div class="ml-row">
+        <div class="ml-label"><span style="color:var(--text);font-weight:600;">${muscleName}</span><br><span style="font-size:10px;">${s.name}</span></div>
+        <div class="ml-value ml-neutral">${s.lastWeight ? s.lastWeight + ' kg' : 'Nuevo'}</div>
+      </div>`;
+    }).join('') + '</div>';
+}
+
 </script>
 </body>
 </html>
- 
