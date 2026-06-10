@@ -1505,10 +1505,15 @@ async function loadCloudState() {
     if (error) { console.error(error); return; }
     if (data) {
       localStorage.setItem('lifts-log', JSON.stringify(data.history || []));
-      localStorage.setItem('lifts-week', JSON.stringify(data.week_plan || []));
       localStorage.setItem('lifts-banned', JSON.stringify(data.banned_exercises || []));
-      try { weekPlan = JSON.parse(localStorage.getItem('lifts-week')) || weekPlan; } catch(e) {}
       try { bannedExercises = JSON.parse(localStorage.getItem('lifts-banned')) || []; } catch(e) {}
+      // Only overwrite weekPlan if remote has actual configured days
+      const remotePlan = data.week_plan;
+      if (remotePlan && remotePlan.length === 7) {
+        localStorage.setItem('lifts-week', JSON.stringify(remotePlan));
+        weekPlan = remotePlan;
+      }
+      // If remote has no plan, keep local weekPlan (already initialised with defaults)
     } else { await _doSave(); }
   } catch(e) { console.error(e); }
 }
@@ -1547,7 +1552,14 @@ async function manualSync() {
 
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) { currentUser = session.user; onLoggedIn(); }
+  if (session?.user) {
+    currentUser = session.user;
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', onLoggedIn);
+    } else {
+      onLoggedIn();
+    }
+  }
 })();
 
 // ═══════════════════════════════════════════
