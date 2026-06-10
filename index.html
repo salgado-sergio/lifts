@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,7 +42,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;disp
 .hdr-date{font-size:10px;color:var(--muted2);letter-spacing:.5px;}
 
 .nav{display:flex;background:var(--s1);border-top:1px solid var(--border);padding:10px 0 calc(var(--safe-bot) + 10px);flex-shrink:0;}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;color:var(--muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.5px;text-transform:uppercase;padding:4px 0;transition:color .2s;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.3px;text-transform:uppercase;padding:4px 0;transition:color .2s;}
 .nav-btn.active{color:var(--acc);}
 .nav-icon{font-size:20px;line-height:1;}
 
@@ -253,24 +254,24 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
 <body>
 <div id="login-screen" style="position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:16px;">
   <div style="font-family:Syne,sans-serif;font-size:32px;font-weight:900;letter-spacing:-2px;color:var(--acc);">LIFTS</div>
-  <div style="font-size:11px;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;margin-top:-8px;">Historial sincronizado</div>
+  <div style="font-size:11px;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;margin-top:-8px;">Synced history</div>
   <div style="display:flex;gap:6px;width:100%;max-width:320px;">
-    <button id="tab-login" class="btn btn-acc" onclick="showTab('login')" style="flex:1;font-size:12px;padding:9px;">Entrar</button>
-    <button id="tab-register" class="btn btn-ghost" onclick="showTab('register')" style="flex:1;font-size:12px;padding:9px;">Crear cuenta</button>
+    <button id="tab-login" class="btn btn-acc" onclick="showTab('login')" style="flex:1;font-size:12px;padding:9px;">Sign In</button>
+    <button id="tab-register" class="btn btn-ghost" onclick="showTab('register')" style="flex:1;font-size:12px;padding:9px;">Create account</button>
   </div>
   <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;">
     <input id="login-email" type="email" placeholder="Email" inputmode="email" autocomplete="email" style="background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:DM Mono,monospace;font-size:14px;padding:14px 16px;outline:none;width:100%;min-height:52px;">
-    <input id="login-password" type="password" placeholder="Contraseña" autocomplete="current-password" style="background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:DM Mono,monospace;font-size:14px;padding:14px 16px;outline:none;width:100%;min-height:52px;">
-    <button id="login-submit-btn" class="btn btn-acc" onclick="submitLogin()" style="width:100%;font-size:14px;padding:14px;">Entrar</button>
-    <button class="btn btn-ghost" onclick="skipLogin()" style="width:100%;font-size:12px;padding:10px;color:var(--muted2);">Usar sin cuenta (solo local)</button>
+    <input id="login-password" type="password" placeholder="Password" autocomplete="current-password" style="background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:DM Mono,monospace;font-size:14px;padding:14px 16px;outline:none;width:100%;min-height:52px;">
+    <button id="login-submit-btn" class="btn btn-acc" onclick="submitLogin()" style="width:100%;font-size:14px;padding:14px;">Sign In</button>
+    <button class="btn btn-ghost" onclick="skipLogin()" style="width:100%;font-size:12px;padding:10px;color:var(--muted2);">Use without account (local only)</button>
   </div>
   <div id="login-status" style="font-size:12px;color:var(--acc3);text-align:center;min-height:18px;"></div>
 </div>
 
 <div id="alarm-overlay">
   <div class="alarm-icon">⏰</div>
-  <div style="font-family:Syne,sans-serif;font-size:22px;font-weight:900;color:var(--acc);letter-spacing:-1px;">¡Descanso terminado!</div>
-  <button class="btn btn-acc" onclick="dismissAlarm()" style="font-size:16px;padding:16px 40px;">¡Vamos! 💪</button>
+  <div style="font-family:Syne,sans-serif;font-size:22px;font-weight:900;color:var(--acc);letter-spacing:-1px;">Rest done!</div>
+  <button class="btn btn-acc" onclick="dismissAlarm()" style="font-size:16px;padding:16px 40px;">Let's go! 💪</button>
 </div>
 
 <div class="app-shell">
@@ -330,6 +331,17 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
     </div>
   </div>
 
+
+  <!-- ML INSIGHTS PAGE -->
+  <div class="page" id="page-ml">
+    <div class="slabel">Weight Progression Prediction</div>
+    <div id="ml-prediction-content"><div style="text-align:center;padding:30px;color:var(--muted2);font-size:12px;">Complete a few workouts to see predictions.</div></div>
+    <div class="slabel" style="margin-top:16px;">Fatigue Detection</div>
+    <div id="ml-fatigue-content"><div style="text-align:center;padding:30px;color:var(--muted2);font-size:12px;">You need at least 2 weeks of history.</div></div>
+    <div class="slabel" style="margin-top:16px;">Exercise Recommendations</div>
+    <div id="ml-recommend-content"><div style="text-align:center;padding:30px;color:var(--muted2);font-size:12px;">Loading...</div></div>
+    <button class="btn btn-ghost" onclick="runMLInsights()" style="width:100%;margin-top:8px;font-size:12px;">🔄 Recalculate</button>
+  </div>
   <nav class="nav">
     <button class="nav-btn active" onclick="switchPage('build')" id="nav-build">
       <span class="nav-icon">⚡</span>Build
@@ -347,17 +359,6 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
       <span class="nav-icon">🧠</span>Insights
     </button>
   </nav>
-</div>
-
-<!-- ML INSIGHTS PAGE -->
-<div class="page" id="page-ml">
-  <div class="slabel">Predicción de Progresión</div>
-  <div id="ml-prediction-content"><div style="text-align:center;padding:30px;color:var(--muted2);font-size:12px;">Completa algunos entrenos para ver predicciones.</div></div>
-  <div class="slabel" style="margin-top:16px;">Detección de Fatiga</div>
-  <div id="ml-fatigue-content"><div style="text-align:center;padding:30px;color:var(--muted2);font-size:12px;">Necesitas al menos 2 semanas de historial.</div></div>
-  <div class="slabel" style="margin-top:16px;">Recomendaciones</div>
-  <div id="ml-recommend-content"><div style="text-align:center;padding:30px;color:var(--muted2);font-size:12px;">Cargando...</div></div>
-  <button class="btn btn-ghost" onclick="switchPage('ml')" style="width:100%;margin-top:8px;font-size:12px;">🔄 Recalcular</button>
 </div>
 
 <!-- Exercise Picker Modal -->
@@ -1436,8 +1437,8 @@ function showTab(mode) {
   const isLogin = mode === 'login';
   document.getElementById('tab-login').className = 'btn ' + (isLogin ? 'btn-acc' : 'btn-ghost');
   document.getElementById('tab-register').className = 'btn ' + (!isLogin ? 'btn-acc' : 'btn-ghost');
-  document.getElementById('login-submit-btn').textContent = isLogin ? 'Entrar' : 'Crear cuenta';
-  document.getElementById('login-password').placeholder = isLogin ? 'Contraseña' : 'Nueva contraseña (mín. 6 chars)';
+  document.getElementById('login-submit-btn').textContent = isLogin ? 'Sign In' : 'Create account';
+  document.getElementById('login-password').placeholder = isLogin ? 'Password' : 'New password (min. 6 chars)';
   document.getElementById('login-password').autocomplete = isLogin ? 'current-password' : 'new-password';
   document.getElementById('login-status').textContent = '';
 }
@@ -1446,21 +1447,21 @@ async function submitLogin() {
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
   const statusEl = document.getElementById('login-status');
-  if (!email || !password) { statusEl.textContent = 'Rellena email y contraseña.'; return; }
+  if (!email || !password) { statusEl.textContent = 'Please fill in email and password.'; return; }
   statusEl.textContent = '...';
   let result;
   if (loginMode === 'register') {
     result = await sb.auth.signUp({ email, password });
     if (!result.error && result.data?.user && !result.data.session) {
-      statusEl.textContent = '📬 Confirma tu email para activar la cuenta.'; return;
+      statusEl.textContent = '📬 Check your email to confirm your account.'; return;
     }
   } else {
     result = await sb.auth.signInWithPassword({ email, password });
   }
   if (result.error) {
     const msg = result.error.message;
-    if (msg.includes('Invalid login')) statusEl.textContent = '❌ Email o contraseña incorrectos.';
-    else if (msg.includes('Email not confirmed')) statusEl.textContent = '📬 Confirma tu email primero.';
+    if (msg.includes('Invalid login')) statusEl.textContent = '❌ Incorrect email or password.';
+    else if (msg.includes('Email not confirmed')) statusEl.textContent = '📬 Please confirm your email first.';
     else statusEl.textContent = '❌ ' + msg;
     return;
   }
@@ -1518,7 +1519,7 @@ async function _doSave() {
 }
 
 async function manualSync() {
-  if (!currentUser) { alert('No has iniciado sesión.'); return; }
+  if (!currentUser) { alert('You are not logged in.'); return; }
   const btn = document.getElementById('sync-btn');
   btn.textContent = '☁️ ...';
   await loadCloudState();
@@ -1562,7 +1563,7 @@ function checkSavedSession() {
     const banner = document.createElement('div');
     banner.className = 'resume-banner';
     const encoded = encodeURIComponent(JSON.stringify(state));
-    banner.innerHTML = '<div style="font-size:12px;color:var(--muted2);">⚡ Sesión sin guardar</div><div style="display:flex;gap:6px;"><button class="btn btn-ghost" style="font-size:11px;padding:6px 10px;" onclick="discardSaved(this)">Descartar</button><button class="btn btn-acc" style="font-size:11px;padding:6px 12px;" onclick="resumeSaved(this,\'' + encoded + '\')">Continuar ▶</button></div>';
+    banner.innerHTML = '<div style="font-size:12px;color:var(--muted2);">⚡ Unsaved session</div><div style="display:flex;gap:6px;"><button class="btn btn-ghost" style="font-size:11px;padding:6px 10px;" onclick="discardSaved(this)">Discard</button><button class="btn btn-acc" style="font-size:11px;padding:6px 12px;" onclick="resumeSaved(this,\'' + encoded + '\')">Resume ▶</button></div>';
     const sessionPage = document.getElementById('page-session');
     if (sessionPage) sessionPage.insertBefore(banner, sessionPage.firstChild);
   } catch(e) {}
@@ -1583,7 +1584,7 @@ function discardSaved(btn) { clearSessionState(); btn.closest('.resume-banner').
 function openSessionSwap(rIdx) {
   sessionSwapTarget = rIdx;
   const item = routine[rIdx];
-  document.getElementById('swap-modal-sub').textContent = item ? 'Reemplazando: ' + item.name : '';
+  document.getElementById('swap-modal-sub').textContent = item ? 'Replacing: ' + item.name : '';
   document.getElementById('swap-modal-overlay').classList.add('open');
 }
 
@@ -1593,25 +1594,55 @@ function openSessionSwap(rIdx) {
 // ═══════════════════════════════════════════
 
 async function runMLInsights() {
-  if (!currentUser) {
-    ['ml-prediction-content','ml-fatigue-content','ml-recommend-content'].forEach(id => {
-      document.getElementById(id).innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">Inicia sesión para ver tus insights.</div>';
+  // Build sets array from both localStorage (old) and Supabase (new)
+  let sets = [];
+
+  // 1. Read from localStorage history (old format)
+  try {
+    const log = JSON.parse(localStorage.getItem('lifts-log') || '[]');
+    log.forEach(entry => {
+      (entry.exercises || []).forEach(ex => {
+        (ex.sets || []).forEach((s, i) => {
+          if (!s.done) return;
+          sets.push({
+            exercise_id: ex.exerciseId || ex.name.toLowerCase().replace(/\s+/g,'-'),
+            exercise_name: ex.name,
+            muscle_key: ex.muscleKey || '',
+            workout_date: entry.date,
+            set_number: i + 1,
+            weight: s.weight ? parseFloat(s.weight) : null,
+            reps: s.reps || null,
+            done: true
+          });
+        });
+      });
     });
-    return;
+  } catch(e) {}
+
+  // 2. Merge with Supabase workout_sets (deduplicate by date+exercise+set)
+  if (currentUser) {
+    try {
+      const since = new Date(Date.now() - 90*24*60*60*1000).toISOString();
+      const { data: remoteSets } = await sb
+        .from('workout_sets')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .gte('workout_date', since)
+        .order('workout_date', { ascending: true });
+      if (remoteSets && remoteSets.length > 0) {
+        const remoteKeys = new Set(remoteSets.map(s => s.workout_date.slice(0,10) + s.exercise_id + s.set_number));
+        sets = sets.filter(s => !remoteKeys.has(s.workout_date.slice(0,10) + s.exercise_id + s.set_number));
+        sets = sets.concat(remoteSets);
+      }
+    } catch(e) {}
   }
 
-  // Fetch last 90 days of workout_sets
-  const since = new Date(Date.now() - 90*24*60*60*1000).toISOString();
-  const { data: sets, error } = await sb
-    .from('workout_sets')
-    .select('*')
-    .eq('user_id', currentUser.id)
-    .gte('workout_date', since)
-    .order('workout_date', { ascending: true });
+  sets.sort((a,b) => a.workout_date.localeCompare(b.workout_date));
 
-  if (error || !sets || sets.length === 0) {
+  const noData = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">Complete some workouts to see insights.</div>';
+  if (sets.length === 0) {
     ['ml-prediction-content','ml-fatigue-content','ml-recommend-content'].forEach(id => {
-      document.getElementById(id).innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">Completa algunos entrenos para ver insights.</div>';
+      document.getElementById(id).innerHTML = noData;
     });
     return;
   }
@@ -1660,13 +1691,13 @@ async function renderPredictions(sets) {
 
   const el = document.getElementById('ml-prediction-content');
   if (predictions.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">Necesitas al menos 2 sesiones por ejercicio.</div>';
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">You need at least 2 sessions per exercise.</div>';
     return;
   }
 
   // Mostrar top 6 ejercicios más recientes
   const sorted = predictions.sort((a,b) => b.sessions - a.sessions).slice(0,6);
-  el.innerHTML = '<div class="ml-card"><div class="ml-card-title">📈 Próxima sesión estimada</div>' +
+  el.innerHTML = '<div class="ml-card"><div class="ml-card-title">📈 Estimated next session</div>' +
     sorted.map(p => {
       const sign = p.diff >= 0 ? '+' : '';
       const cls = p.diff > 0.5 ? 'ml-up' : p.diff < -0.5 ? 'ml-down' : 'ml-neutral';
@@ -1697,7 +1728,7 @@ function renderFatigue(sets) {
   const el = document.getElementById('ml-fatigue-content');
   const muscles = Object.entries(byMuscle).filter(([k,v]) => v.older > 0 || v.recent > 0);
   if (muscles.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">Necesitas más historial.</div>';
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">You need more history.</div>';
     return;
   }
 
@@ -1706,7 +1737,7 @@ function renderFatigue(sets) {
     const ratio = avgPerWeek > 0 ? v.recent / avgPerWeek : 1;
     const pct = Math.min(100, Math.round(ratio * 100));
     const barColor = ratio > 1.2 ? 'var(--acc3)' : ratio > 0.8 ? 'var(--acc)' : 'var(--muted)';
-    const label = ratio > 1.3 ? '⚠️ Alta carga' : ratio > 0.8 ? '✅ Normal' : '😴 Poco volumen';
+    const label = ratio > 1.3 ? '⚠️ High load' : ratio > 0.8 ? '✅ Normal' : '😴 Low volume';
     const muscleName = LIBRARY[muscle] ? LIBRARY[muscle].label : muscle;
     return `<div class="ml-row">
       <div class="ml-label">${muscleName}</div>
@@ -1717,7 +1748,7 @@ function renderFatigue(sets) {
     </div>`;
   });
 
-  el.innerHTML = '<div class="ml-card"><div class="ml-card-title">🔥 Carga por músculo (vs media 3 semanas)</div>' + rows.join('') + '</div>';
+  el.innerHTML = '<div class="ml-card"><div class="ml-card-title">🔥 Muscle load (vs 3-week average)</div>' + rows.join('') + '</div>';
 }
 
 // ── RECOMENDACIONES ──
@@ -1757,11 +1788,11 @@ function renderRecommendations(sets) {
 
   const el = document.getElementById('ml-recommend-content');
   if (suggestions.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">Has entrenado todos los grupos recientemente. ¡Buen trabajo! 💪</div>';
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted2);font-size:12px;">You have trained all muscle groups recently. Great work! 💪</div>';
     return;
   }
 
-  el.innerHTML = '<div class="ml-card"><div class="ml-card-title">💡 Músculos listos para entrenar</div>' +
+  el.innerHTML = '<div class="ml-card"><div class="ml-card-title">💡 Muscles ready to train</div>' +
     suggestions.slice(0,6).map(s => {
       const muscleName = LIBRARY[s.muscle] ? LIBRARY[s.muscle].label : s.muscle;
       return `<div class="ml-row">
@@ -1771,6 +1802,17 @@ function renderRecommendations(sets) {
     }).join('') + '</div>';
 }
 
+
+// Prevent zoom on double-tap and pinch
+document.addEventListener('touchstart', function(e) {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+let lastTap = 0;
+document.addEventListener('touchend', function(e) {
+  const now = Date.now();
+  if (now - lastTap < 300) e.preventDefault();
+  lastTap = now;
+}, { passive: false });
 </script>
 </body>
 </html>
