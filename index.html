@@ -289,6 +289,15 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
     <div class="page active" id="page-build">
       <div class="slabel">Select Muscle Groups</div>
       <div class="muscle-grid" id="muscle-grid"></div>
+      <div class="slabel" style="margin-top:0;">Generate with AI</div>
+      <button class="btn btn-acc" style="width:100%;font-size:13px;padding:13px;margin-bottom:8px;" onclick="generateTodayWorkout()">⚡ Smart Workout for Today</button>
+
+      <div class="slabel">Or select muscle groups</div>
+      <div class="muscle-grid" id="ai-muscle-pick" style="margin-bottom:10px;"></div>
+      <button class="btn btn-acc" id="gen-from-muscles-btn" style="width:100%;font-size:12px;padding:11px;display:none;margin-bottom:10px;" onclick="generateFromSelectedMuscles()">🧠 Generate Optimal Workout</button>
+
+      <div class="slabel">Manual routine</div>
+      <div class="muscle-grid" id="muscle-grid"></div>
       <div class="build-actions">
         <button class="btn btn-ghost" onclick="clearRoutine()">Clear</button>
         <button class="btn btn-acc" onclick="startSession()">Start Session →</button>
@@ -577,6 +586,7 @@ let swapTarget = null; // {dayIdx, itemIdx}
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   renderMuscleGrid();
+  renderAIMuscleGrid();
   renderRoutinePreview();
   renderDayGrid();
   renderBannedSection();
@@ -595,6 +605,7 @@ function switchPage(name) {
   document.getElementById('main-scroll').scrollTop = 0;
   if (name === 'log') renderLog();
   if (name === 'ai') { renderDayGrid(); renderBannedSection(); }
+  if (name === 'build') { renderAIMuscleGrid(); }
   if (name === 'session' && routine.length > 0) requestWakeLock();
   else if (name !== 'session') releaseWakeLock();
   if (name === 'ml') runMLInsights();
@@ -1214,33 +1225,195 @@ function generateAIPlan() {
   }, 800);
 }
 
+// ── AI MUSCLE PICKER in Build ──
+let aiPickSelected = new Set();
+
+function renderAIMuscleGrid() {
+  const grid = document.getElementById('ai-muscle-pick');
+  if (!grid) return;
+  grid.innerHTML = Object.entries(LIBRARY).map(([key, m]) => `
+    <div class="muscle-chip ${aiPickSelected.has(key) ? 'sel' : ''}" onclick="toggleAIPick('${key}')">
+      <span class="muscle-chip-icon">${m.icon}</span>
+      <span class="muscle-chip-name">${m.label}</span>
+    </div>`).join('');
+  document.getElementById('gen-from-muscles-btn').style.display = aiPickSelected.size > 0 ? 'block' : 'none';
+}
+
+function toggleAIPick(key) {
+  if (aiPickSelected.has(key)) aiPickSelected.delete(key);
+  else aiPickSelected.add(key);
+  renderAIMuscleGrid();
+}
+
+function generateFromSelectedMuscles() {
+  if (aiPickSelected.size === 0) return;
+  const recentMap = getRecentMuscles(4);
+  clearRoutine();
+  const usedIds = new Set();
+
+  aiPickSelected.forEach(muscle => {
+    selectedMuscles.add(muscle);
+    const daysSince = recentMap[muscle] || 999;
+    // If trained recently (<2 days), use fewer sets
+    const fatigued = daysSince < 2;
+
+    const exList = (LIBRARY[muscle]?.exercises || [])
+      .filter(e => !bannedExercises.includes(e.id) && !usedIds.has(e.id));
+
+    // Pick best exercises: primary compound + isolation based on fatigue
+    const numExercises = fatigued ? 1 : (aiPickSelected.size <= 2 ? 3 : 2);
+    const picks = exList.slice(0, numExercises);
+
+    picks.forEach(ex => {
+      usedIds.add(ex.id);
+      const sets = fatigued ? Math.max(2, ex.sets - 1) : ex.sets;
+      routine.push({
+        muscleKey: muscle, exerciseId: ex.id, name: ex.name,
+        sets, reps: ex.reps, rest: ex.rest
+      });
+    });
+  });
+
+  renderMuscleGrid();
+  renderRoutinePreview();
+
+  // Banner with fatigue info
+  const wrap = document.getElementById('routine-preview-wrap');
+  const existing = wrap.querySelector('.ai-gen-banner');
+  if (existing) existing.remove();
+
+  const lines = [...aiPickSelected].map(m => {
+    const d = recentMap[m] || 999;
+    const label = d >= 999 ? 'fresh' : d < 1 ? '⚠️ trained today' : d < 2 ? '⚠️ ' + d.toFixed(1) + 'd ago' : '✅ ' + Math.round(d) + 'd ago';
+    return `<span style="color:var(--text)">${LIBRARY[m].label}</span> <span style="color:var(--muted2);font-size:9px;">${label}</span>`;
+  }).join(' &nbsp;·&nbsp; ');
+
+  const banner = document.createElement('div');
+  banner.className = 'ai-gen-banner';
+  banner.style.cssText = 'background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:10px;font-size:11px;line-height:2;';
+  banner.innerHTML = '🧠 <strong style="color:var(--acc)">AI generated:</strong> ' + lines;
+  wrap.insertBefore(banner, wrap.firstChild);
+
+  // Reset picker
+  aiPickSelected.clear();
+  renderAIMuscleGrid();
+}
+
+// ── SMART PLAN GENERATION (history-aware) ──
+
+function getRecentMuscles(days) {
+  // Returns map of muscleKey -> daysSinceLastTrained
+  const log = JSON.parse(localStorage.getItem('lifts-log') || '[]');
+  const now = Date.now();
+  const result = {};
+  Object.keys(LIBRARY).forEach(m => result[m] = 999); // default = never trained
+  log.forEach(entry => {
+    const age = (now - new Date(entry.date).getTime()) / 86400000;
+    if (age > days) return;
+    (entry.exercises || []).forEach(ex => {
+      if (result[ex.muscleKey] === undefined || age < result[ex.muscleKey]) {
+        result[ex.muscleKey] = age;
+      }
+    });
+  });
+  return result;
+}
+
+function pickExerciseForMuscle(muscleKey, usedIds) {
+  const exs = (LIBRARY[muscleKey]?.exercises || [])
+    .filter(e => !bannedExercises.includes(e.id) && !usedIds.has(e.id));
+  if (exs.length === 0) return null;
+  // Prefer compound (first in list = heavier compound)
+  return exs[0];
+}
+
+function generateTodayWorkout() {
+  const recentMap = getRecentMuscles(4);
+
+  // Sort muscles by most rested (highest daysSince = most ready)
+  const sorted = Object.entries(recentMap)
+    .sort((a, b) => b[1] - a[1]);
+
+  // Pick top 3-4 muscle groups most in need of training
+  // Avoid antagonist overload: limit to reasonable combos
+  const antagonists = {
+    chest: 'back', back: 'chest',
+    biceps: 'triceps', triceps: 'biceps',
+    legs: 'hamstrings', hamstrings: 'legs'
+  };
+
+  const chosen = [];
+  const usedIds = new Set();
+
+  for (const [muscle] of sorted) {
+    if (chosen.length >= 4) break;
+    // Skip if antagonist already chosen and we already have 2+
+    const ant = antagonists[muscle];
+    if (ant && chosen.includes(ant) && chosen.length >= 2) continue;
+    chosen.push(muscle);
+  }
+
+  // Build routine: 2 exercises per muscle group
+  clearRoutine();
+  chosen.forEach(muscle => {
+    selectedMuscles.add(muscle);
+    const exList = (LIBRARY[muscle]?.exercises || [])
+      .filter(e => !bannedExercises.includes(e.id) && !usedIds.has(e.id));
+
+    // Add primary (compound) + secondary (isolation) if available
+    const picks = exList.slice(0, 2);
+    picks.forEach(ex => {
+      usedIds.add(ex.id);
+      routine.push({
+        muscleKey: muscle,
+        exerciseId: ex.id,
+        name: ex.name,
+        sets: ex.sets,
+        reps: ex.reps,
+        rest: ex.rest
+      });
+    });
+  });
+
+  renderMuscleGrid();
+  renderRoutinePreview();
+
+  // Show what was chosen and why
+  const wrap = document.getElementById('routine-preview-wrap');
+  const daysSince = chosen.map(m => {
+    const d = recentMap[m];
+    const label = d >= 999 ? 'never trained' : d < 1 ? 'today' : Math.round(d) + 'd ago';
+    return `<span style="color:var(--acc2)">${LIBRARY[m].label}</span> <span style="color:var(--muted2);font-size:9px;">(${label})</span>`;
+  }).join(' · ');
+
+  const banner = document.createElement('div');
+  banner.style.cssText = 'background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:10px;font-size:11px;line-height:1.8;';
+  banner.innerHTML = '⚡ <strong style="color:var(--acc)">Auto-selected:</strong> ' + daysSince;
+  wrap.insertBefore(banner, wrap.firstChild);
+}
+
 function buildSmartPlan(gymDays, cfDays) {
   const n = gymDays.length;
-  // Assign templates based on number of gym days
+  const recentMap = getRecentMuscles(4);
+
+  // Assign focus templates based on gym days count
   let templates = [];
-  if (n === 1) {
-    templates = ['upper'];
-  } else if (n === 2) {
-    templates = ['upper','lower'];
-  } else if (n === 3) {
-    templates = ['push','pull','legs'];
-  } else if (n === 4) {
-    templates = ['push','pull','legs','upper'];
-  } else if (n === 5) {
-    templates = ['push','pull','legs','shoulders_arms','upper'];
-  } else {
-    templates = ['push','pull','legs','push','pull','legs'];
-  }
+  if (n === 1) templates = ['upper'];
+  else if (n === 2) templates = ['upper','lower'];
+  else if (n === 3) templates = ['push','pull','legs'];
+  else if (n === 4) templates = ['push','pull','legs','upper'];
+  else if (n === 5) templates = ['push','pull','legs','shouldersarms','upper'];
+  else templates = ['push','pull','legs','push','pull','legs'];
 
   // Detect CrossFit muscle fatigue
   const cfMuscles = new Set();
   cfDays.forEach(d => {
-    const wod = (d.wod||'').toLowerCase();
+    const wod = (d.wod || '').toLowerCase();
     if (wod.includes('pull') || wod.includes('deadlift') || wod.includes('row')) { cfMuscles.add('back'); cfMuscles.add('biceps'); }
     if (wod.includes('push') || wod.includes('bench') || wod.includes('dip')) { cfMuscles.add('chest'); cfMuscles.add('triceps'); }
     if (wod.includes('squat') || wod.includes('lunge') || wod.includes('thruster')) { cfMuscles.add('legs'); cfMuscles.add('hamstrings'); }
-    if (wod.includes('shoulder') || wod.includes('press')) { cfMuscles.add('shoulders'); }
-    if (wod.includes('core') || wod.includes('ab') || wod.includes('sit-up')) { cfMuscles.add('core'); }
+    if (wod.includes('shoulder') || wod.includes('press')) cfMuscles.add('shoulders');
+    if (wod.includes('core') || wod.includes('ab') || wod.includes('sit-up')) cfMuscles.add('core');
   });
 
   return gymDays.map((day, i) => {
@@ -1252,27 +1425,32 @@ function buildSmartPlan(gymDays, cfDays) {
         const ex = getExerciseFromLibrary(item.muscle, item.id);
         if (!ex) return null;
         const fatigued = cfMuscles.has(item.muscle);
+        // Reduce sets if muscle trained recently (< 2 days ago)
+        const daysSince = recentMap[item.muscle] || 999;
+        const recentlyTrained = daysSince < 2;
+        const sets = (fatigued || recentlyTrained) ? Math.max(2, ex.sets - 1) : ex.sets;
         return {
-          muscleKey: item.muscle,
-          exerciseId: item.id,
-          name: ex.name,
-          sets: fatigued ? Math.max(2, ex.sets - 1) : ex.sets,
-          reps: ex.reps,
-          rest: ex.rest,
-          note: item.note + (fatigued ? ' (reduced — CF fatigue)' : ''),
+          muscleKey: item.muscle, exerciseId: item.id, name: ex.name,
+          sets, reps: ex.reps, rest: ex.rest, note: item.note,
+          fatigued: fatigued || recentlyTrained
         };
       }).filter(Boolean);
+
+    const notes = [];
+    if (cfDays.length > 0) notes.push(`Adjusted for ${cfDays.length} CrossFit day(s).`);
+    const recentMusclesInPlan = [...new Set(items.map(i => i.muscleKey))]
+      .filter(m => (recentMap[m] || 999) < 2);
+    if (recentMusclesInPlan.length > 0) notes.push(`Reduced volume for recently trained: ${recentMusclesInPlan.map(m => LIBRARY[m]?.label).join(', ')}.`);
 
     return {
       dayName: day.name,
       focus: tmpl.focus,
       items,
-      rationale: cfDays.length > 0
-        ? `Scheduled after reviewing ${cfDays.length} CrossFit day(s). Muscles overlapping with WOD movements have reduced volume.`
-        : `Classic ${tmpl.focus.split('·')[0].trim()} split. Compound lifts first, isolation finishers last.`
+      rationale: notes.length > 0 ? notes.join(' ') : `Classic ${tmpl.focus.split(' ')[0]} split. Compound lifts first, isolation finishers last.`
     };
   });
 }
+
 
 function renderAIPlan(plan) {
   let html = `<div class="ai-result">
@@ -1496,7 +1674,7 @@ async function onLoggedIn() {
   btn.style.display = 'block'; btn.textContent = '☁️ ...';
   await loadCloudState();
   btn.textContent = '☁️';
-  renderMuscleGrid(); renderRoutinePreview(); renderDayGrid(); renderBannedSection(); renderLog();
+  renderMuscleGrid(); renderAIMuscleGrid(); renderRoutinePreview(); renderDayGrid(); renderBannedSection(); renderLog();
 }
 
 async function loadCloudState() {
