@@ -334,11 +334,9 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
       <div id="ai-result"></div>
       <div id="banned-section"></div>
     </div>
-  </div>
 
-
-  <!-- ML INSIGHTS PAGE -->
-  <div class="page" id="page-ml">
+    <!-- ML INSIGHTS PAGE -->
+    <div class="page" id="page-ml">
     <div class="slabel">Weight Progression Prediction</div>
     <div id="ml-prediction-content"><div style="text-align:center;padding:30px;color:var(--muted2);font-size:12px;">Complete a few workouts to see predictions.</div></div>
     <div class="slabel" style="margin-top:16px;">Fatigue Detection</div>
@@ -347,6 +345,8 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
     <div id="ml-recommend-content"><div style="text-align:center;padding:30px;color:var(--muted2);font-size:12px;">Loading...</div></div>
     <button class="btn btn-ghost" onclick="runMLInsights()" style="width:100%;margin-top:8px;font-size:12px;">🔄 Recalculate</button>
   </div>
+  </div>
+
   <nav class="nav">
     <button class="nav-btn active" onclick="switchPage('build')" id="nav-build">
       <span class="nav-icon">⚡</span>Build
@@ -365,6 +365,7 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
     </button>
   </nav>
 </div>
+
 
 <!-- Exercise Picker Modal -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModalIfBg(event)">
