@@ -164,13 +164,14 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;disp
 .wod-input-wrap{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
 .wod-textarea{background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:10px 12px;width:100%;outline:none;resize:none;min-height:80px;line-height:1.6;}
 .wod-textarea:focus{border-color:var(--acc);}
-.day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:12px;}
-.day-cell{background:var(--s3);border:1.5px solid var(--border2);border-radius:8px;padding:10px 4px;cursor:pointer;text-align:center;transition:all .15s;user-select:none;position:relative;min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.day-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+.day-cell{background:var(--s3);border:1.5px solid var(--border2);border-radius:10px;padding:12px 6px;cursor:pointer;text-align:center;transition:all .15s;user-select:none;position:relative;min-height:64px;}
 .day-cell.cf{background:#1a1008;border-color:#ff9f3a;color:#ff9f3a;}
+.day-cell.selected{box-shadow:0 0 0 2px var(--acc);}
 .day-cell.gym{background:#0d1a10;border-color:var(--acc);color:var(--acc);}
 .day-cell.rest{background:var(--s2);border-color:var(--border);color:var(--muted);}
-.day-cell-name{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;}
-.day-cell-icon{font-size:14px;margin-top:3px;display:block;min-height:18px;}
+.day-cell-name{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;display:block;margin-bottom:4px;}
+.day-cell-icon{font-size:18px;display:block;min-height:22px;}
 .day-type-row{display:flex;gap:6px;margin-bottom:10px;}
 .day-type-btn{flex:1;background:var(--s3);border:1.5px solid var(--border2);border-radius:8px;color:var(--muted2);font-family:'DM Mono',monospace;font-size:10px;padding:7px 4px;cursor:pointer;text-align:center;transition:all .15s;letter-spacing:.3px;}
 .day-type-btn.sel-cf{background:#1a1008;border-color:#ff9f3a;color:#ff9f3a;}
@@ -592,6 +593,7 @@ function switchPage(name) {
   document.getElementById('nav-' + name).classList.add('active');
   document.getElementById('main-scroll').scrollTop = 0;
   if (name === 'log') renderLog();
+  if (name === 'ai') { renderDayGrid(); renderBannedSection(); }
   if (name === 'session' && routine.length > 0) requestWakeLock();
   else if (name !== 'session') releaseWakeLock();
   if (name === 'ml') runMLInsights();
@@ -1061,6 +1063,10 @@ function renderDayGrid() {
 
 function openDayEditor(i) {
   selectedDay = i;
+  // Highlight selected cell
+  document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
+  const cells = document.querySelectorAll('.day-cell');
+  if (cells[i]) cells[i].classList.add('selected');
   const day = weekPlan[i];
   document.getElementById('day-editor-icon').textContent = day.name;
   document.getElementById('day-editor-title-text').textContent = 'Configure ' + day.name;
@@ -1098,6 +1104,7 @@ function saveDayEditor() {
 
 function closeDayEditor() {
   document.getElementById('day-editor').classList.remove('open');
+  document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
   selectedDay = null;
 }
 
