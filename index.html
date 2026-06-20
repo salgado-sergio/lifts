@@ -1,11 +1,14 @@
-<html lang="en"><head>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Lifts">
 <title>Lifts</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&amp;family=Syne:wght@700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
 
@@ -289,6 +292,32 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
 .last-perf-row{font-size:11px;color:var(--muted2);line-height:1.7;}
 
 </style>
+  <!-- PWA / Install -->
+  <meta name="theme-color" content="#08110a">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LIFTS">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2308110a'/><text y='.9em' font-size='80' x='10'>🏋️</text></svg>">
+  <script>
+    // Inject manifest as blob so single-file PWA works
+    const _manifest = {
+      name: 'LIFTS',
+      short_name: 'LIFTS',
+      description: 'Smart Workout Tracker',
+      start_url: '.',
+      display: 'standalone',
+      background_color: '#08110a',
+      theme_color: '#08110a',
+      icons: [{
+        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2308110a'/><text y='.9em' font-size='80' x='10'>🏋️</text></svg>",
+        sizes: '512x512', type: 'image/svg+xml'
+      }]
+    };
+    const _mBlob = new Blob([JSON.stringify(_manifest)], {type:'application/json'});
+    const _mUrl = URL.createObjectURL(_mBlob);
+    const _mLink = document.createElement('link');
+    _mLink.rel = 'manifest'; _mLink.href = _mUrl;
+    document.currentScript.parentNode.insertBefore(_mLink, document.currentScript);
+  </script>
 </head>
 <body>
 <div id="login-screen" style="position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:16px;">
@@ -317,18 +346,18 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
   <div class="hdr">
     <div class="hdr-left">
       <button id="back-btn" onclick="switchPage('home')" class="back-btn">
-        <svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M6 1L1 6L6 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        <svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M6 1L1 6L6 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Menu
       </button>
     </div>
     <div class="hdr-center">
       <div class="hdr-logo">LIFTS</div>
-      <div class="hdr-date" id="hdr-date">Saturday, June 20</div>
+      <div class="hdr-date" id="hdr-date"></div>
       <div id="session-elapsed" style="display:none;font-family:'DM Mono',monospace;font-size:10px;color:var(--acc);letter-spacing:.06em;margin-top:1px;">⏱ 0:00</div>
     </div>
     <div class="hdr-right">
       <button id="sync-btn" onclick="showSyncConfirm()" class="sync-btn">
-        <svg id="sync-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.6 6.1M3 12a9 9 0 0 1 15.6-6.1"></path><polyline points="21 4 21 10 15 10"></polyline><polyline points="3 20 3 14 9 14"></polyline></svg>
+        <svg id="sync-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.6 6.1M3 12a9 9 0 0 1 15.6-6.1"/><polyline points="21 4 21 10 15 10"/><polyline points="3 20 3 14 9 14"/></svg>
         Sync
       </button>
     </div>
@@ -398,47 +427,7 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
         <div style="font-size:10px;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Muscle Groups</div>
         <button class="btn btn-ghost" style="width:100%;font-size:12px;padding:10px;margin-bottom:10px;" onclick="autoSuggestMuscles()">🎯 Auto-suggest based on history</button>
         <div style="font-size:10px;color:var(--muted2);margin-bottom:8px;">Tap to add / remove:</div>
-        <div class="muscle-grid" id="ai-muscle-pick" style="margin-bottom:14px;">
-    <div class="muscle-chip " onclick="toggleAIPick('chest')">
-      <span class="muscle-chip-icon">💪</span>
-      <span class="muscle-chip-name">Chest</span>
-    </div>
-    <div class="muscle-chip " onclick="toggleAIPick('back')">
-      <span class="muscle-chip-icon">🏗️</span>
-      <span class="muscle-chip-name">Back</span>
-    </div>
-    <div class="muscle-chip " onclick="toggleAIPick('shoulders')">
-      <span class="muscle-chip-icon">🔱</span>
-      <span class="muscle-chip-name">Shoulders</span>
-    </div>
-    <div class="muscle-chip " onclick="toggleAIPick('biceps')">
-      <span class="muscle-chip-icon">💪</span>
-      <span class="muscle-chip-name">Biceps</span>
-    </div>
-    <div class="muscle-chip " onclick="toggleAIPick('triceps')">
-      <span class="muscle-chip-icon">🔻</span>
-      <span class="muscle-chip-name">Triceps</span>
-    </div>
-    <div class="muscle-chip " onclick="toggleAIPick('legs')">
-      <span class="muscle-chip-icon">🦵</span>
-      <span class="muscle-chip-name">Quads</span>
-    </div>
-    <div class="muscle-chip " onclick="toggleAIPick('hamstrings')">
-      <span class="muscle-chip-icon">🦿</span>
-      <span class="muscle-chip-name">Hamstrings</span>
-    </div>
-    <div class="muscle-chip " onclick="toggleAIPick('glutes')">
-      <span class="muscle-chip-icon">🍑</span>
-      <span class="muscle-chip-name">Glutes</span>
-    </div>
-    <div class="muscle-chip " onclick="toggleAIPick('core')">
-      <span class="muscle-chip-icon">⚙️</span>
-      <span class="muscle-chip-name">Core</span>
-    </div>
-    <div class="muscle-chip " onclick="toggleAIPick('calves')">
-      <span class="muscle-chip-icon">🦶</span>
-      <span class="muscle-chip-name">Calves</span>
-    </div></div>
+        <div class="muscle-grid" id="ai-muscle-pick" style="margin-bottom:14px;"></div>
       </div>
 
       <!-- Generate button -->
@@ -459,41 +448,13 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
     <!-- LOG PAGE -->
     <div class="page" id="page-log">
       <div class="slabel">Training History</div>
-      <div id="log-content"><div class="empty-log"><span style="font-size:36px">📋</span><br>No workouts yet.<br>Complete a session to see history.</div></div>
+      <div id="log-content"></div>
     </div>
 
     <!-- AI COACH PAGE -->
     <div class="page" id="page-ai">
       <div class="slabel">Weekly Schedule <span style="font-size:9px;color:var(--muted2);letter-spacing:0;text-transform:none;font-family:'DM Mono',monospace;">— tap a day to configure</span></div>
-      <div class="day-grid" id="ai-day-grid">
-    <div class="day-cell gym" onclick="openDayEditor(0)">
-      <div class="day-cell-name">Mon</div>
-      <span class="day-cell-icon">🏋️</span>
-    </div>
-    <div class="day-cell rest" onclick="openDayEditor(1)">
-      <div class="day-cell-name">Tue</div>
-      <span class="day-cell-icon">😴</span>
-    </div>
-    <div class="day-cell gym" onclick="openDayEditor(2)">
-      <div class="day-cell-name">Wed</div>
-      <span class="day-cell-icon">🏋️</span>
-    </div>
-    <div class="day-cell rest" onclick="openDayEditor(3)">
-      <div class="day-cell-name">Thu</div>
-      <span class="day-cell-icon">😴</span>
-    </div>
-    <div class="day-cell gym" onclick="openDayEditor(4)">
-      <div class="day-cell-name">Fri</div>
-      <span class="day-cell-icon">🏋️</span>
-    </div>
-    <div class="day-cell rest" onclick="openDayEditor(5)">
-      <div class="day-cell-name">Sat</div>
-      <span class="day-cell-icon">😴</span>
-    </div>
-    <div class="day-cell rest" onclick="openDayEditor(6)">
-      <div class="day-cell-name">Sun</div>
-      <span class="day-cell-icon">😴</span>
-    </div></div>
+      <div class="day-grid" id="ai-day-grid"></div>
 
       <div class="day-editor" id="day-editor">
         <div class="day-editor-title">
@@ -502,13 +463,12 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
           <button onclick="closeDayEditor()" style="background:var(--s3);border:1px solid var(--border2);border-radius:6px;color:var(--muted2);font-size:12px;padding:4px 10px;cursor:pointer;font-family:'DM Mono',monospace;">✕ Close</button>
         </div>
         <div class="day-type-row">
-          <button class="day-type-btn" id="dtype-cf" onclick="setDayType('crossfit')">🏃 CrossFit</button>
-          <button class="day-type-btn" id="dtype-gym" onclick="setDayType('gym')">🏋️ Gym</button>
+          <button class="day-type-btn" id="dtype-cf"   onclick="setDayType('crossfit')">🏃 CrossFit</button>
+          <button class="day-type-btn" id="dtype-gym"  onclick="setDayType('gym')">🏋️ Gym</button>
           <button class="day-type-btn" id="dtype-rest" onclick="setDayType('rest')">😴 Rest</button>
         </div>
         <div id="wod-editor-wrap">
-          <textarea class="wod-textarea" id="wod-text" placeholder="Describe WOD movements, e.g: Fran — thrusters, pull-ups
-Leave blank if WOD is unknown"></textarea>
+          <textarea class="wod-textarea" id="wod-text" placeholder="Describe WOD movements, e.g: Fran — thrusters, pull-ups&#10;Leave blank if WOD is unknown"></textarea>
           <button class="btn btn-ghost" style="width:100%;margin-top:8px;font-size:12px;" onclick="saveDayEditor()">Save</button>
         </div>
         <button class="btn btn-ghost" style="width:100%;margin-top:6px;font-size:12px;" onclick="closeDayEditor()">Done ✓</button>
@@ -599,8 +559,8 @@ Leave blank if WOD is unknown"></textarea>
   <div class="timer-pill">
     <div class="t-ring-wrap">
       <svg class="t-ring" viewBox="0 0 64 64">
-        <circle class="t-ring-bg" cx="32" cy="32" r="28"></circle>
-        <circle class="t-ring-prog" id="t-ring-prog" cx="32" cy="32" r="28"></circle>
+        <circle class="t-ring-bg" cx="32" cy="32" r="28"/>
+        <circle class="t-ring-prog" id="t-ring-prog" cx="32" cy="32" r="28"/>
       </svg>
       <div class="t-num" id="t-num">—</div>
     </div>
@@ -3042,5 +3002,5 @@ document.addEventListener('touchend', function(e) {
     <button id="save-confirm-btn" onclick="closeSaveConfirm()" style="display:none;width:100%;padding:12px;border-radius:11px;background:var(--acc);border:none;color:#08110a;font-weight:700;font-size:14px;cursor:pointer;">Done</button>
   </div>
 </div>
-
-</body></html>
+</body>
+</html>
