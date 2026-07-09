@@ -1330,7 +1330,7 @@ let swapTarget = null; // {dayIdx, itemIdx}
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   renderMuscleGrid();
   renderAIMuscleGrid();
@@ -1339,6 +1339,28 @@ document.addEventListener('DOMContentLoaded', () => {
   renderBannedSection();
   renderLog();
   checkSavedSession();
+
+  // Mostrar login por defecto mientras se verifica si hay sesion guardada
+  document.getElementById('login-screen').style.display = 'flex';
+
+  try {
+    const { data } = await sb.auth.getSession();
+    if (data && data.session && data.session.user) {
+      currentUser = data.session.user;
+      await onLoggedIn();
+    }
+  } catch (e) {
+    console.error('Error checking session', e);
+  }
+
+  // Mantener currentUser sincronizado con cambios de auth (login/logout/refresh)
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session && session.user) {
+      currentUser = session.user;
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null;
+    }
+  });
 });
 
 // ═══════════════════════════════════════
