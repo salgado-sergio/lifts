@@ -1504,20 +1504,29 @@ function clearRoutine() {
 // ═══════════════════════════════════════
 // LAST PERFORMANCE
 // ═══════════════════════════════════════
-function suggestWeight(exerciseName, muscleKey) {
+function suggestWeight(exerciseName, muscleKey, exerciseId) {
   try {
     const log = JSON.parse(localStorage.getItem('lifts-log') || '[]');
 
-    // Gather this exercise's history (last 8 sessions)
+    // Gather this exercise's history (last 8 sessions). We anchor everything on the FIRST
+    // working (non-warmup) set of each session — that's the actual "base" weight the pyramid
+    // was built from (set 1 = 100% of working weight, later sets are +5%/+10% on top of it).
+    // Using the session's average across an ascending pyramid instead would compound upward
+    // every time we regenerate a new pyramid from it.
     const exHistory = [];
     for (const day of log) {
       const ex = day.exercises.find(e => e.name === exerciseName);
       if (ex) {
-        const doneSets = ex.sets.filter(s => s.done && s.weight && parseFloat(s.weight) > 0);
-        if (doneSets.length > 0) {
-          const avg = doneSets.reduce((a,s) => a + parseFloat(s.weight), 0) / doneSets.length;
-          const max = Math.max(...doneSets.map(s => parseFloat(s.weight)));
-          exHistory.push({ date: day.date, avg, max, sets: doneSets.length, totalSets: ex.sets.length });
+        const working = (ex.sets || []).filter(s => !s.warmup);
+        const doneWorking = working.filter(s => s.done && s.weight && parseFloat(s.weight) > 0);
+        if (doneWorking.length > 0) {
+          const anchor = doneWorking[0];
+          exHistory.push({
+            date: day.date,
+            anchorWeight: parseFloat(anchor.weight),
+            doneCount: doneWorking.length,
+            totalCount: working.length
+          });
         }
       }
       if (exHistory.length >= 8) break;
@@ -1525,47 +1534,99 @@ function suggestWeight(exerciseName, muscleKey) {
 
     if (exHistory.length >= 1) {
       const last = exHistory[0];
-      // Check if last session was "successful" (all planned sets done)
-      const completionRate = last.sets / Math.max(last.totalSets, last.sets);
+      const completionRate = last.doneCount / Math.max(last.totalCount, last.doneCount);
 
-      // Compute trend from last 3 sessions
-      let trend = 0;
-      if (exHistory.length >= 2) {
-        const recentAvg = exHistory.slice(0, Math.min(3, exHistory.length)).reduce((a,e) => a + e.avg, 0) / Math.min(3, exHistory.length);
-        const olderAvg = exHistory.slice(Math.min(3, exHistory.length)).reduce((a,e) => a + e.avg, 0) / Math.max(1, exHistory.length - 3);
-        trend = recentAvg - olderAvg; // positive = progressing
-      }
+      // Two rough sessions in a row → deload, rather than reacting to a single off day
+      const strugglingStreak = exHistory.length >= 2 &&
+        completionRate < 0.6 &&
+        (exHistory[1].doneCount / Math.max(exHistory[1].totalCount, 1)) < 0.6;
+
+      // A long layoff since this exercise was last logged means we shouldn't assume
+      // strength held steady — ease back in a little instead.
+      const daysSinceLast = (Date.now() - new Date(last.date).getTime()) / 86400000;
+      const detrained = daysSinceLast > 14;
+
+      // Is this muscle group carrying unusually high volume recently? If so, be more
+      // conservative with the jump (mirrors the "High load" signal in Insights).
+      const overloaded = isMuscleOverloaded(muscleKey, log);
 
       let suggested;
-      if (completionRate >= 0.85) {
-        // Good session — micro progression: +2.5 lbs (or +1.25 for isolation)
-        const increment = ['biceps','triceps','shoulders'].includes(muscleKey) ? 2.5 : 5;
-        suggested = last.avg + (trend >= 0 ? increment : 0);
+      if (strugglingStreak) {
+        suggested = last.anchorWeight * 0.9; // deload ~10%
+      } else if (detrained) {
+        suggested = last.anchorWeight * 0.95; // ease back after a break
+      } else if (completionRate >= 1) {
+        // Completed every working set at target reps — progress.
+        const isIsolation = ['biceps','triceps','shoulders'].includes(muscleKey);
+        let increment = Math.max(isIsolation ? 2.5 : 5, last.anchorWeight * (isIsolation ? 0.02 : 0.025));
+        if (overloaded) increment /= 2;
+        suggested = last.anchorWeight + increment;
       } else {
-        // Incomplete — repeat same weight
-        suggested = last.avg;
+        // Didn't finish everything — repeat the same weight rather than penalizing a single miss
+        suggested = last.anchorWeight;
       }
       return parseFloat(suggested.toFixed(1));
     }
 
-    // No history for this exercise — estimate from same muscle group
-    const muscleHistory = [];
+    // No history for this exercise — estimate from other exercises in the same muscle group.
+    // Prefer exercises using the same equipment type (barbell/dumbbell/machine), since absolute
+    // loads differ a lot by equipment even within one muscle group (e.g. a barbell row vs a
+    // cable fly for "back"/"chest").
+    const sameEquip = [];
+    const otherEquip = [];
+    const seenExercise = {};
     for (const day of log.slice(0, 20)) {
       (day.exercises || []).filter(e => e.muscleKey === muscleKey && e.name !== exerciseName).forEach(ex => {
-        const doneSets = ex.sets.filter(s => s.done && s.weight && parseFloat(s.weight) > 0);
-        if (doneSets.length > 0) {
-          const avg = doneSets.reduce((a,s) => a + parseFloat(s.weight), 0) / doneSets.length;
-          muscleHistory.push(avg);
+        const exKey = ex.exerciseId || ex.name;
+        if (seenExercise[exKey]) return; // one data point per exercise, most recent occurrence only
+        const working = (ex.sets || []).filter(s => !s.warmup);
+        const doneWorking = working.filter(s => s.done && s.weight && parseFloat(s.weight) > 0);
+        if (doneWorking.length > 0) {
+          seenExercise[exKey] = true;
+          const avg = doneWorking.reduce((a,s) => a + parseFloat(s.weight), 0) / doneWorking.length;
+          (getEquipmentClass(ex.exerciseId) === getEquipmentClass(exerciseId) ? sameEquip : otherEquip).push(avg);
         }
       });
     }
-    if (muscleHistory.length > 0) {
-      // Use 80% of muscle group average as starting point for new exercise
-      const muscleAvg = muscleHistory.reduce((a,v) => a+v, 0) / muscleHistory.length;
-      return parseFloat((muscleAvg * 0.8).toFixed(1));
+    if (sameEquip.length > 0) {
+      const avg = sameEquip.reduce((a,v) => a+v, 0) / sameEquip.length;
+      return parseFloat((avg * 0.9).toFixed(1));
+    }
+    if (otherEquip.length > 0) {
+      const avg = otherEquip.reduce((a,v) => a+v, 0) / otherEquip.length;
+      return parseFloat((avg * 0.65).toFixed(1));
     }
   } catch(e) {}
   return null;
+}
+
+// Rough recent-load check reusing the same "recent week vs 3-week average" idea as
+// the Muscle Load panel in Insights, so weight suggestions ease off when a muscle
+// is already carrying more volume than usual.
+function isMuscleOverloaded(muscleKey, log) {
+  try {
+    const now = Date.now();
+    const week1 = now - 7*24*60*60*1000;
+    const week4 = now - 28*24*60*60*1000;
+    let recent = 0, older = 0;
+    (log || []).forEach(day => {
+      const t = new Date(day.date).getTime();
+      if (t < week4) return;
+      (day.exercises || []).filter(e => e.muscleKey === muscleKey).forEach(ex => {
+        const count = (ex.sets || []).filter(s => s.done && !s.warmup).length;
+        if (t >= week1) recent += count; else older += count;
+      });
+    });
+    const avgPerWeek = older / 3;
+    if (avgPerWeek <= 0) return false;
+    return (recent / avgPerWeek) > 1.3;
+  } catch(e) { return false; }
+}
+
+function getEquipmentClass(exerciseId) {
+  if (isBarbell(exerciseId)) return 'barbell';
+  if (isDumbbell(exerciseId)) return 'dumbbell';
+  return 'machine';
 }
 
 // ── WEIGHT LISTS ──
@@ -1589,10 +1650,10 @@ function snapToWeight(val, exerciseId) {
   const list = getWeightList(exerciseId);
   return list.reduce((best, w) => Math.abs(w - val) < Math.abs(best - val) ? w : best, list[0]);
 }
-function buildPyramidSets(workingWeight, numSets, lastReps, exerciseId) {
+function buildPyramidSets(workingWeight, numSets, lastReps, exerciseId, libraryReps) {
   // Drop the warmup — numSets is already the working count
   // Pyramid: start at working weight, increase, decrease reps
-  const baseReps = lastReps ? parseInt(lastReps) || 10 : 10;
+  const baseReps = parseRepsTarget(lastReps) || parseRepsTarget(libraryReps) || 10;
   const sets = [];
   for (let i = 0; i < numSets; i++) {
     // Weight increases each set: 0%, +5%, +10%...
@@ -1605,14 +1666,28 @@ function buildPyramidSets(workingWeight, numSets, lastReps, exerciseId) {
   }
   return sets;
 }
+// Extracts a rep target from either a plain number ("8") or a range like "8–10"
+// (library format). Uses the higher end of a range as the starting point, since
+// the pyramid itself decreases reps as weight increases across sets.
+function parseRepsTarget(repsStr) {
+  if (!repsStr) return null;
+  const nums = String(repsStr).match(/\d+/g);
+  if (!nums || nums.length === 0) return null;
+  return parseInt(nums[nums.length - 1]);
+}
 function getLastPerformance(exerciseName) {
   try {
     const log = JSON.parse(localStorage.getItem('lifts-log') || '[]');
     for (const day of log) {
       const ex = day.exercises.find(e => e.name === exerciseName);
       if (ex && ex.sets && ex.sets.length > 0) {
-        const last = ex.sets[ex.sets.length - 1];
-        return {weight: last.weight !== '—' ? last.weight : '', reps: last.reps !== '—' ? last.reps : ''};
+        // Anchor on the first working set (the pyramid's base), not the last one —
+        // the last set is always the heaviest/lowest-rep set of the pyramid, so using
+        // it here would make rep targets shrink session after session.
+        const working = ex.sets.filter(s => !s.warmup);
+        const last = working[0] || ex.sets[0];
+        if (!last) continue;
+        return {weight: last.weight !== '—' ? last.weight : '', reps: last.reps !== '—' ? last.reps : '', date: day.date};
       }
     }
   } catch(e) {}
@@ -1647,16 +1722,18 @@ function startSession() {
     const uid = r.muscleKey + '-' + r.exerciseId;
     const last = getLastPerformance(r.name);
     if (!sessionSets[uid]) {
-      const suggested = suggestWeight(r.name, r.muscleKey);
+      const suggested = suggestWeight(r.name, r.muscleKey, r.exerciseId);
       const lastReps = last ? last.reps : '';
       const workingW = suggested !== null ? snapToWeight(suggested, r.exerciseId) : (last ? snapToWeight(parseFloat(last.weight) || 0, r.exerciseId) || '' : '');
-      sessionSets[uid] = buildPyramidSets(workingW || null, r.sets, lastReps, r.exerciseId);
-      // Warmup set for first exercise of each muscle group
+      sessionSets[uid] = buildPyramidSets(workingW || null, r.sets, lastReps, r.exerciseId, r.reps);
+      // Warmup set for first exercise of each muscle group: half the weight, same reps as the first working set
       const isFirstOfMuscle = routine.filter(rx => rx.muscleKey === r.muscleKey).indexOf(r) === 0;
       if (isFirstOfMuscle) {
-        const firstWorkingWeight = sessionSets[uid][0]?.weight;
+        const firstWorkingSet = sessionSets[uid][0];
+        const firstWorkingWeight = firstWorkingSet?.weight;
+        const firstWorkingReps = firstWorkingSet?.reps;
         const warmupWeight = firstWorkingWeight ? snapToWeight(parseFloat(firstWorkingWeight) / 2, r.exerciseId) : '';
-        sessionSets[uid].unshift({ weight: warmupWeight, reps: '5', done: false, warmup: true, rest: 30 });
+        sessionSets[uid].unshift({ weight: warmupWeight, reps: firstWorkingReps || '5', done: false, warmup: true, rest: 30 });
       }
     }
   });
@@ -1808,7 +1885,7 @@ async function saveWorkout() {
   const exercises = routine.map(r => {
     const uid = r.muscleKey + '-' + r.exerciseId;
     const sets = (sessionSets[uid] || []).map(s => ({
-      weight: s.weight || '', reps: s.reps || '', done: s.done
+      weight: s.weight || '', reps: s.reps || '', done: s.done, warmup: !!s.warmup
     }));
     const durationSec = (exStartTime[uid] && exDoneTime[uid])
       ? Math.round((exDoneTime[uid] - exStartTime[uid]) / 1000)
@@ -2487,8 +2564,8 @@ function addExDuringSession(muscleKey, exerciseId) {
   const newEntry = { muscleKey, exerciseId: ex.id, name: ex.name, sets: ex.sets, reps: ex.reps, rest: ex.rest };
   routine.push(newEntry);
   const uid = muscleKey + '-' + exerciseId;
-  const workingW = suggestWeight(newEntry);
-  sessionSets[uid] = buildPyramidSets(workingW || null, ex.sets, null, exerciseId);
+  const workingW = suggestWeight(newEntry.name, newEntry.muscleKey, newEntry.exerciseId);
+  sessionSets[uid] = buildPyramidSets(workingW || null, ex.sets, null, exerciseId, ex.reps);
   closeAddExModal();
   renderSession();
   // Open the newly added card
@@ -2604,9 +2681,18 @@ function setDefaultRest(secs, silent) {
 }
 
 async function signOut() {
-  if (currentUser) await sb.auth.signOut();
+  try {
+    if (currentUser) await sb.auth.signOut();
+  } catch(e) {
+    console.error('Sign out error:', e);
+    // Even if the remote sign-out call fails (network issue, expired session, etc.),
+    // still clear local state below so the button doesn't appear to do nothing.
+  }
   currentUser = null;
-  document.getElementById('sync-btn').style.display = 'none'; document.getElementById('sync-btn').classList.remove('syncing');
+  const syncBtn = document.getElementById('sync-btn');
+  if (syncBtn) { syncBtn.style.display = 'none'; syncBtn.classList.remove('syncing'); }
+  const userEl = document.getElementById('settings-user');
+  if (userEl) userEl.textContent = 'Not signed in (local mode)';
   document.getElementById('login-screen').style.display = 'flex';
 }
 
@@ -2740,38 +2826,72 @@ function generateSmartWorkout() {
   selectedMuscles.clear();
   routine.forEach(r => selectedMuscles.add(r.muscleKey));
   const usedIds = new Set(routine.map(r => r.exerciseId));
+  const recentLog = JSON.parse(localStorage.getItem('lifts-log') || '[]');
+
+  const TRANSITION = 100; // seconds between exercises
+  const SETUP_BUFFER = 300; // 5 min general warm-up/cooldown overhead for the whole session
+
+  function setTimeFor(name, muscle) {
+    const learned = getLearnedExerciseTime(name, muscle);
+    return learned !== null ? learned : 50; // conservative default per set
+  }
+  // Real time cost of an exercise: its own set count and rest (not a flat "3 sets" guess),
+  // plus an extra warm-up set's worth of time if it's the first exercise of its muscle group
+  // (matching the warm-up set startSession() actually adds).
+  function exerciseSeconds(name, muscle, sets, rest, withWarmup) {
+    let sec = sets * (setTimeFor(name, muscle) + rest) + TRANSITION;
+    if (withWarmup) sec += setTimeFor(name, muscle) + 30;
+    return sec;
+  }
+
+  // Time already spoken for by exercises the user added manually — the AI additions need to
+  // fit in what's left, not stack on top and blow past the selected duration.
+  let usedSeconds = 0;
+  routine.forEach(r => {
+    const isFirstOfMuscle = routine.filter(rx => rx.muscleKey === r.muscleKey).indexOf(r) === 0;
+    usedSeconds += exerciseSeconds(r.name, r.muscleKey, r.sets, r.rest, isFirstOfMuscle);
+  });
+
+  const totalBudgetSec = Math.max(0, selectedDuration * 60 - SETUP_BUFFER);
+  const remainingSec = Math.max(0, totalBudgetSec - usedSeconds);
+  const perMuscleBudget = musclestoTrain.length > 0 ? remainingSec / musclestoTrain.length : 0;
 
   musclestoTrain.forEach(muscle => {
     selectedMuscles.add(muscle);
     const daysSince = recentMap[muscle] || 999;
     const fatigued = daysSince < 2;
-    // Time budget: use learned times if available, else conservative defaults
-    const effectiveMinutes = selectedDuration - 10;
-    const muscleExercises = LIBRARY[muscle]?.exercises || [];
-    const learnedTimes = muscleExercises.map(ex => getLearnedExerciseTime(ex.name, muscle)).filter(t => t !== null);
-    const SET_TIME = learnedTimes.length > 0
-      ? learnedTimes.reduce((a,v) => a+v, 0) / learnedTimes.length
-      : 50; // conservative default (was 40, bumped up to be more realistic)
-    const TRANSITION = 100; // seconds between exercises (slightly more conservative)
-    const avgRest = (LIBRARY[muscle]?.exercises?.[0]?.rest || 90);
-    const timePerEx = (3 * (SET_TIME + avgRest) + TRANSITION) / 60;
-    const totalExBudget = Math.floor(effectiveMinutes / timePerEx);
-    const exPerMuscle = Math.max(1, Math.floor(totalExBudget / musclestoTrain.length));
-    const cappedExPerMuscle = Math.min(exPerMuscle, selectedDuration <= 30 ? 1 : selectedDuration <= 45 ? 2 : 3);
-    const numEx = fatigued ? Math.max(1, cappedExPerMuscle - 1) : cappedExPerMuscle;
+    const hasManualForMuscle = routine.some(r => r.muscleKey === muscle);
 
-    const recentLog = JSON.parse(localStorage.getItem('lifts-log') || '[]');
-    const picks = pickExercisesForMuscle(muscle, numEx, usedIds, recentLog);
+    // Sanity ceiling on exercise count, reduced by one if this muscle is already fatigued
+    const capBase = selectedDuration <= 30 ? 1 : selectedDuration <= 45 ? 2 : 3;
+    const cap = fatigued ? Math.max(1, capBase - 1) : capBase;
+    const candidates = pickExercisesForMuscle(muscle, cap, usedIds, recentLog);
 
-    picks.forEach(ex => {
-      usedIds.add(ex.id);
+    let muscleBudgetLeft = perMuscleBudget;
+    let addedForMuscle = 0;
+    candidates.forEach(ex => {
       const sets = fatigued ? Math.max(2, ex.sets - 1) : ex.sets;
+      const isFirstOfGroup = !hasManualForMuscle && addedForMuscle === 0;
+      const cost = exerciseSeconds(ex.name, muscle, sets, ex.rest, isFirstOfGroup);
+      // Always guarantee at least one exercise per selected muscle, even on a tight budget
+      if (addedForMuscle > 0 && cost > muscleBudgetLeft) return;
+      usedIds.add(ex.id);
       routine.push({ muscleKey: muscle, exerciseId: ex.id, name: ex.name, sets, reps: ex.reps, rest: ex.rest, aiGenerated: true });
+      muscleBudgetLeft -= cost;
+      addedForMuscle++;
     });
   });
 
   renderMuscleGrid();
   renderRoutinePreview();
+
+  // Recompute the real predicted length of the final routine for the banner
+  let totalPredictedSec = 0;
+  routine.forEach(r => {
+    const isFirstOfMuscle = routine.filter(rx => rx.muscleKey === r.muscleKey).indexOf(r) === 0;
+    totalPredictedSec += exerciseSeconds(r.name, r.muscleKey, r.sets, r.rest, isFirstOfMuscle);
+  });
+  const estMinutes = Math.round((totalPredictedSec + SETUP_BUFFER) / 60);
 
   // Banner
   const wrap = document.getElementById('routine-preview-wrap');
@@ -2787,7 +2907,8 @@ function generateSmartWorkout() {
   const banner = document.createElement('div');
   banner.className = 'ai-gen-banner';
   banner.style.cssText = 'background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:10px;font-size:11px;line-height:2;';
-  banner.innerHTML = (aiPickSelected.size > 0 ? '🧠' : '⚡') + ' <strong style="color:var(--acc)">' + (aiPickSelected.size > 0 ? 'Generated for selected:' : 'Auto-selected:') + '</strong> ' + lines;
+  banner.innerHTML = (aiPickSelected.size > 0 ? '🧠' : '⚡') + ' <strong style="color:var(--acc)">' + (aiPickSelected.size > 0 ? 'Generated for selected:' : 'Auto-selected:') + '</strong> ' + lines +
+    `<br><span style="color:var(--muted2);">⏱ ~${estMinutes} min estimated (target ${selectedDuration} min)</span>`;
   wrap.insertBefore(banner, wrap.firstChild);
 
   renderAIMuscleGrid();
