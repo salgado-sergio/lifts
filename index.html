@@ -1,17 +1,16 @@
 
-
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(1576)https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/147176322/655a1224-1ff3-4aae-84b8-c7244f24db14/index.html?AWSAccessKeyId=ASIA2F3EMEYE6GLSSCP5&Signature=OCUyh%2BBD5JvUixYIzUETk%2FOXyzA%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEN3%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJHMEUCIH47TlwdQ%2Fb8LXPtgAYiOeJwF8nx6wFAzyRV6tBYjkaeAiEA6u7mNwS4ki7h%2BlLlFGUVswKZ%2Bz3AwoZWW2LXtSJf9z0q%2FAQIpv%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARABGgw2OTk3NTMzMDk3MDUiDKXVlXG48YRehDfftCrQBCNxq0r%2FdXbjvrswZe2Q16WIzoZrMSRhie3NknQhzoThtxeJnRUfib%2BBJo5gUJ4Jee61C0optZ4cw7ApDnPDdh%2F5GDCLA86PWnBB6hGZzzAdzqjP6WqBOWW1pIPN%2FkF8YOnzjutK6q%2FTdrxTeZC8hB3m4FI6tXjx69NXbqbI0DGXzeygXtv%2FKt9t0Y6oPRX4glFh0Cc1n8wMFOkdwpao1eIsKEsp0unNR7sMqm4Q%2BeVQOjxMK6UUFWjQ6%2FHj9rWgYbxm44DQcN2a%2BtB5vGti262bVLm61YCLNA3vIqtT5hjmaQA1HY52QjRPEVZ%2FvooOojXaNCXm9lXdvbKFIfcI9q51nXnqpE0zwIUpGsOnFVaOhGv9A%2FXSRoAVPQBhTy2mQLw%2Buq2cL69OTRzT8q1mkT9MBiSliGax6nOYQ3o7oCmFggjXc9CjQUqOAZK1zRxHwwJsOpFrUG%2FCgDUmt5NiRN2%2FFn3tGodmD9LC65vz20cPKm%2BuLf9U1AMQhQ8RyUGnHs4YWgrqR5iwYSltAaB16k8IFYpsKYgkDZ4fuc4ayD8yCDlCy%2FV26JE3NjXgCgy%2B22QWrXL2OCc54UqRiqo1u5VlS1IA4x%2FC8W%2Fgskn1%2FJ2oYchs4EJtfxlu2x3fFNITy28AvyXky9TlDEL8JUePCwSpkFjkgc7SdxbKtZQVBThDtgt9ad0IV2ZzD5pZzEqodFWYmLTNcLXEUKqYqe%2BN2BfqR1SaUzXKt%2Bx1w30I0uUHZQNi8hKoQNu%2BcyeahIJg1n4ufcsIH1Xv%2FnQDl%2BTfjS0wsJfA0gY6mAFN%2BAHYNNCSdiPNbYBUzeGM8cx5YwuhOQ9lUdUtF7uhjn0eF%2FOb7hecFC8YBKuOelZ7VFcgj69582c1r5rUUWl1qHDVcKKBZnh8g2wj02iulqFFv7PPbvyr9l6%2BidkR94eFiyB7KDiPc6mF5mCDovbOl%2B1Er6x%2FfPuUeetuLtxXmoh5RSus9tI07zeVcZ42j4mxesTfzu8WNw%3D%3D&Expires=1783633252 -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Lifts">
 <title>Lifts</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<link href="./Lifts_files/css2" rel="stylesheet">
+<script src="./Lifts_files/supabase-js@2"></script>
+<script src="./Lifts_files/tf.min.js.download"></script>
 
 <style>
 :root {
@@ -41,6 +40,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;disp
 .hdr{padding:calc(var(--safe-top) + 14px) 18px 14px;background:var(--bg);border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;flex-shrink:0;}
 .hdr-logo{font-family:'Syne',sans-serif;font-size:26px;font-weight:900;letter-spacing:-1.5px;color:var(--acc);}
 .hdr-date{font-size:10px;color:var(--muted2);letter-spacing:.5px;}
+.hdr-session-big{display:none;font-family:'Syne',sans-serif;font-size:30px;font-weight:900;letter-spacing:-1px;color:var(--acc);line-height:1;font-variant-numeric:tabular-nums;}
+.hdr-session-big.show{display:block;}
+.hdr-logo.hide,.hdr-date.hide{display:none;}
 
 .nav{display:flex;background:var(--s1);border-top:1px solid var(--border);padding:10px 0 calc(var(--safe-bot) + 10px);flex-shrink:0;}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.3px;text-transform:uppercase;padding:4px 0;transition:color .2s;}
@@ -296,12 +298,12 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
   <meta name="theme-color" content="#08110a">
 </head>
 <body>
-<div id="login-screen" style="position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:16px;">
+<div id="login-screen" style="position: fixed; inset: 0px; background: var(--bg); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; gap: 16px;">
   <div style="font-family:Syne,sans-serif;font-size:32px;font-weight:900;letter-spacing:-2px;color:var(--acc);">LIFTS</div>
   <div style="font-size:11px;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;margin-top:-8px;">Synced history</div>
   <div style="display:flex;gap:6px;width:100%;max-width:320px;">
-    <button id="tab-login" class="btn btn-acc" onclick="showTab('login')" style="flex:1;font-size:12px;padding:9px;">Sign In</button>
-    <button id="tab-register" class="btn btn-ghost" onclick="showTab('register')" style="flex:1;font-size:12px;padding:9px;">Create account</button>
+    <button id="tab-login" class="btn btn-acc" onclick="showTab(&#39;login&#39;)" style="flex:1;font-size:12px;padding:9px;">Sign In</button>
+    <button id="tab-register" class="btn btn-ghost" onclick="showTab(&#39;register&#39;)" style="flex:1;font-size:12px;padding:9px;">Create account</button>
   </div>
   <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;">
     <input id="login-email" type="email" placeholder="Email" inputmode="email" autocomplete="email" style="background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:DM Mono,monospace;font-size:14px;padding:14px 16px;outline:none;width:100%;min-height:52px;">
@@ -321,19 +323,20 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
 <div class="app-shell">
   <div class="hdr">
     <div class="hdr-left">
-      <button id="back-btn" onclick="switchPage('home')" class="back-btn">
-        <svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M6 1L1 6L6 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <button id="back-btn" onclick="switchPage(&#39;home&#39;)" class="back-btn">
+        <svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M6 1L1 6L6 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
         Menu
       </button>
     </div>
     <div class="hdr-center">
       <div class="hdr-logo" id="hdr-logo">LIFTS</div>
-      <div class="hdr-date" id="hdr-date"></div>
-      <div id="session-elapsed" style="display:none;font-family:'DM Mono',monospace;font-size:10px;color:var(--acc);letter-spacing:.06em;margin-top:1px;">⏱ 0:00</div>
+      <div class="hdr-date" id="hdr-date">Thursday, July 9</div>
+      <div id="hdr-session-big" class="hdr-session-big">0:00</div>
+      <div id="session-elapsed" style="display:none;font-family:&#39;DM Mono&#39;,monospace;font-size:10px;color:var(--acc);letter-spacing:.06em;margin-top:1px;">⏱ 0:00</div>
     </div>
     <div class="hdr-right">
-      <button id="sync-btn" onclick="showSyncConfirm()" class="sync-btn">
-        <svg id="sync-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.6 6.1M3 12a9 9 0 0 1 15.6-6.1"/><polyline points="21 4 21 10 15 10"/><polyline points="3 20 3 14 9 14"/></svg>
+      <button id="sync-btn" onclick="showSyncConfirm()" class="sync-btn" style="display: flex;">
+        <svg id="sync-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.6 6.1M3 12a9 9 0 0 1 15.6-6.1"></path><polyline points="21 4 21 10 15 10"></polyline><polyline points="3 20 3 14 9 14"></polyline></svg>
         Sync
       </button>
     </div>
@@ -343,36 +346,36 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
     <!-- HOME PAGE -->
     <div class="page active" id="page-home">
       <div style="margin-bottom:20px;">
-        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);">Hey 👋</div>
+        <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:22px;font-weight:800;color:var(--text);">Hey 👋</div>
         <div style="font-size:11px;color:var(--muted2);margin-top:3px;" id="home-date"></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <button class="home-card" onclick="switchPage('build')">
+        <button class="home-card" onclick="switchPage(&#39;build&#39;)">
           <span class="home-card-icon">⚡</span>
           <span class="home-card-label">Build</span>
           <span class="home-card-sub">Create workouts</span>
         </button>
-        <button class="home-card" onclick="switchPage('session')">
+        <button class="home-card" onclick="switchPage(&#39;session&#39;)">
           <span class="home-card-icon">🏋️</span>
           <span class="home-card-label">Session</span>
           <span class="home-card-sub">Track live</span>
         </button>
-        <button class="home-card" onclick="switchPage('ai')">
+        <button class="home-card" onclick="switchPage(&#39;ai&#39;)">
           <span class="home-card-icon">🤖</span>
           <span class="home-card-label">AI Coach</span>
           <span class="home-card-sub">Smart plans</span>
         </button>
-        <button class="home-card" onclick="switchPage('log')">
+        <button class="home-card" onclick="switchPage(&#39;log&#39;)">
           <span class="home-card-icon">📋</span>
           <span class="home-card-label">History</span>
           <span class="home-card-sub">Past sessions</span>
         </button>
-        <button class="home-card" onclick="switchPage('ml')">
+        <button class="home-card" onclick="switchPage(&#39;ml&#39;)">
           <span class="home-card-icon">🧠</span>
           <span class="home-card-label">Insights</span>
           <span class="home-card-sub">Progress stats</span>
         </button>
-        <button class="home-card" onclick="switchPage('settings')">
+        <button class="home-card" onclick="switchPage(&#39;settings&#39;)">
           <span class="home-card-icon">⚙️</span>
           <span class="home-card-label">Settings</span>
           <span class="home-card-sub">Preferences</span>
@@ -404,7 +407,47 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
         <div style="font-size:10px;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Muscle Groups</div>
         <button class="btn btn-ghost" style="width:100%;font-size:12px;padding:10px;margin-bottom:10px;" onclick="autoSuggestMuscles()">🎯 Auto-suggest based on history</button>
         <div style="font-size:10px;color:var(--muted2);margin-bottom:8px;">Tap to add / remove:</div>
-        <div class="muscle-grid" id="ai-muscle-pick" style="margin-bottom:14px;"></div>
+        <div class="muscle-grid" id="ai-muscle-pick" style="margin-bottom:14px;">
+    <div class="muscle-chip " onclick="toggleAIPick(&#39;chest&#39;)">
+      <span class="muscle-chip-icon">💪</span>
+      <span class="muscle-chip-name">Chest</span>
+    </div>
+    <div class="muscle-chip " onclick="toggleAIPick(&#39;back&#39;)">
+      <span class="muscle-chip-icon">🏗️</span>
+      <span class="muscle-chip-name">Back</span>
+    </div>
+    <div class="muscle-chip " onclick="toggleAIPick(&#39;shoulders&#39;)">
+      <span class="muscle-chip-icon">🔱</span>
+      <span class="muscle-chip-name">Shoulders</span>
+    </div>
+    <div class="muscle-chip " onclick="toggleAIPick(&#39;biceps&#39;)">
+      <span class="muscle-chip-icon">💪</span>
+      <span class="muscle-chip-name">Biceps</span>
+    </div>
+    <div class="muscle-chip " onclick="toggleAIPick(&#39;triceps&#39;)">
+      <span class="muscle-chip-icon">🔻</span>
+      <span class="muscle-chip-name">Triceps</span>
+    </div>
+    <div class="muscle-chip " onclick="toggleAIPick(&#39;legs&#39;)">
+      <span class="muscle-chip-icon">🦵</span>
+      <span class="muscle-chip-name">Quads</span>
+    </div>
+    <div class="muscle-chip " onclick="toggleAIPick(&#39;hamstrings&#39;)">
+      <span class="muscle-chip-icon">🦿</span>
+      <span class="muscle-chip-name">Hamstrings</span>
+    </div>
+    <div class="muscle-chip " onclick="toggleAIPick(&#39;glutes&#39;)">
+      <span class="muscle-chip-icon">🍑</span>
+      <span class="muscle-chip-name">Glutes</span>
+    </div>
+    <div class="muscle-chip " onclick="toggleAIPick(&#39;core&#39;)">
+      <span class="muscle-chip-icon">⚙️</span>
+      <span class="muscle-chip-name">Core</span>
+    </div>
+    <div class="muscle-chip " onclick="toggleAIPick(&#39;calves&#39;)">
+      <span class="muscle-chip-icon">🦶</span>
+      <span class="muscle-chip-name">Calves</span>
+    </div></div>
       </div>
 
       <!-- Generate button -->
@@ -425,27 +468,573 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
     <!-- LOG PAGE -->
     <div class="page" id="page-log">
       <div class="slabel">Training History</div>
-      <div id="log-content"></div>
+      <div id="log-content">
+    <div class="log-day" id="logday-0">
+      <div class="log-day-hdr" onclick="toggleLogDay(0)">
+        <div>
+          <div class="log-date">Tue, Jul 7</div>
+          <div style="display:flex;gap:4px;margin-top:4px;">
+            <span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-chest"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-back"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-shoulders"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-biceps"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-core"></span>
+          </div>
+        </div>
+        <div class="log-stats">22 sets · 08:02 PM</div>
+      </div>
+      <div class="log-body">
+        
+          <div class="log-ex">
+            <div class="log-ex-name">Barbell Bench Press</div>
+            
+              <div class="log-set-row">Set 1: <span>55 lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>115 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>115 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>125 lbs × 4 reps</span></div>
+            
+              <div class="log-set-row">Set 5: <span>130 lbs × 4 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Barbell Bent-Over Row</div>
+            
+              <div class="log-set-row">Set 1: <span>50 lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>130 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>140 lbs × 4 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>145 lbs × 4 reps</span></div>
+            
+              <div class="log-set-row">Set 5: <span>150 lbs × 4 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Lateral Raise</div>
+            
+              <div class="log-set-row">Set 1: <span>10 lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>15 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>17.5 lbs × 8 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>20 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 5: <span>22.5 lbs × 4 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Hammer Curl</div>
+            
+              <div class="log-set-row">Set 1: <span>12.5 lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>17.5 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>22.5 lbs × 8 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>25 lbs × 6 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Hanging Leg Raise</div>
+            
+              <div class="log-set-row">Set 1: <span> lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span> lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span> lbs × 7 reps</span></div>
+            
+          </div>
+        <div style="padding:10px 14px;" id="del-wrap-0">
+          <button class="btn btn-ghost" style="font-size:11px;padding:8px 14px;color:var(--acc3);border-color:var(--acc3);" onclick="confirmDeleteLog(0)">Delete Entry</button>
+        </div>
+      </div>
+    </div>
+    <div class="log-day" id="logday-1">
+      <div class="log-day-hdr" onclick="toggleLogDay(1)">
+        <div>
+          <div class="log-date">Tue, Jun 23</div>
+          <div style="display:flex;gap:4px;margin-top:4px;">
+            <span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-back"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-biceps"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-legs"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-glutes"></span>
+          </div>
+        </div>
+        <div class="log-stats">15 sets · 08:08 PM</div>
+      </div>
+      <div class="log-body">
+        
+          <div class="log-ex">
+            <div class="log-ex-name">Pull-Ups</div>
+            
+              <div class="log-set-row">Set 1: <span>12.5 lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span> lbs × 7 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span> lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span> lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 5: <span> lbs × 6 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Barbell Curl</div>
+            
+              <div class="log-set-row">Set 1: <span>45 lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>45 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>55 lbs × 8 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>55 lbs × 8 reps</span></div>
+            
+              <div class="log-set-row">Set 5: <span>60 lbs × 6 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Front Squat</div>
+            
+              <div class="log-set-row">Set 1: <span>100 lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>95 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>105 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>115 lbs × 8 reps</span></div>
+            
+              <div class="log-set-row">Set 5: <span>125 lbs × 5 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Sumo Deadlift</div>
+            
+          </div>
+        <div style="padding:10px 14px;" id="del-wrap-1">
+          <button class="btn btn-ghost" style="font-size:11px;padding:8px 14px;color:var(--acc3);border-color:var(--acc3);" onclick="confirmDeleteLog(1)">Delete Entry</button>
+        </div>
+      </div>
+    </div>
+    <div class="log-day" id="logday-2">
+      <div class="log-day-hdr" onclick="toggleLogDay(2)">
+        <div>
+          <div class="log-date">Mon, Jun 22</div>
+          <div style="display:flex;gap:4px;margin-top:4px;">
+            <span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-hamstrings"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-calves"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-chest"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-shoulders"></span>
+          </div>
+        </div>
+        <div class="log-stats">18 sets · 07:15 PM</div>
+      </div>
+      <div class="log-body">
+        
+          <div class="log-ex">
+            <div class="log-ex-name">Romanian Deadlift</div>
+            
+              <div class="log-set-row">Set 1: <span>95 lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>135 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>155 lbs × 9 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>155 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 5: <span>185 lbs × 9 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Standing Calf Raise</div>
+            
+              <div class="log-set-row">Set 1: <span> lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>135 lbs × 15 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>145 lbs × 15 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>155 lbs × 15 reps</span></div>
+            
+              <div class="log-set-row">Set 5: <span>165 lbs × 14 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Incline DB Press</div>
+            
+              <div class="log-set-row">Set 1: <span>25 lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>45 lbs × 9 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>45 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>45 lbs × 9 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Front Raise</div>
+            
+              <div class="log-set-row">Set 1: <span>10 lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>15 lbs × 12 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>15 lbs × 12 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>15 lbs × 12 reps</span></div>
+            
+          </div>
+        <div style="padding:10px 14px;" id="del-wrap-2">
+          <button class="btn btn-ghost" style="font-size:11px;padding:8px 14px;color:var(--acc3);border-color:var(--acc3);" onclick="confirmDeleteLog(2)">Delete Entry</button>
+        </div>
+      </div>
+    </div>
+    <div class="log-day" id="logday-3">
+      <div class="log-day-hdr" onclick="toggleLogDay(3)">
+        <div>
+          <div class="log-date">Sat, Jun 20</div>
+          <div style="display:flex;gap:4px;margin-top:4px;">
+            <span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-triceps"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-legs"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-glutes"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-core"></span>
+          </div>
+        </div>
+        <div class="log-stats">11 sets · 09:12 AM</div>
+      </div>
+      <div class="log-body">
+        
+          <div class="log-ex">
+            <div class="log-ex-name">Skull Crushers</div>
+            
+              <div class="log-set-row">Set 1: <span>30 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>35 lbs × 8 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>40 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>45 lbs × 4 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Leg Press</div>
+            
+              <div class="log-set-row">Set 1: <span>210 lbs × 12 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>240 lbs × 12 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>260 lbs × 11 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>300 lbs × 10 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Barbell Hip Thrust</div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Plank</div>
+            
+              <div class="log-set-row">Set 1: <span> lbs × 60 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span> lbs × 60 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span> lbs × 60 reps</span></div>
+            
+          </div>
+        <div style="padding:10px 14px;" id="del-wrap-3">
+          <button class="btn btn-ghost" style="font-size:11px;padding:8px 14px;color:var(--acc3);border-color:var(--acc3);" onclick="confirmDeleteLog(3)">Delete Entry</button>
+        </div>
+      </div>
+    </div>
+    <div class="log-day" id="logday-4">
+      <div class="log-day-hdr" onclick="toggleLogDay(4)">
+        <div>
+          <div class="log-date">Thu, Jun 18</div>
+          <div style="display:flex;gap:4px;margin-top:4px;">
+            <span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-chest"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-back"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-shoulders"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-biceps"></span>
+          </div>
+        </div>
+        <div class="log-stats">20 sets · 08:28 PM</div>
+      </div>
+      <div class="log-body">
+        
+          <div class="log-ex">
+            <div class="log-ex-name">Dumbbell Bench Press</div>
+            
+              <div class="log-set-row">Set 1: <span>55 lbs × 7 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>55 lbs × 7 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>55 lbs × 7 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Incline DB Press</div>
+            
+              <div class="log-set-row">Set 1: <span>45 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>45 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>50 lbs × 10 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Dumbbell Row</div>
+            
+              <div class="log-set-row">Set 1: <span>50 lbs × 8 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>50 lbs × 8 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>50 lbs × 8 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>50 lbs × 8 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Conventional Deadlift</div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Front Raise</div>
+            
+              <div class="log-set-row">Set 1: <span>17.5 lbs × 12 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>17.5 lbs × 12 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>17.5 lbs × 12 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Overhead Press (Bar)</div>
+            
+              <div class="log-set-row">Set 1: <span>85 lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>85 lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>85 lbs × 5 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>85 lbs × 5 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Hammer Curl</div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Dumbbell Curl</div>
+            
+              <div class="log-set-row">Set 1: <span>22.5 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>25 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>25 lbs × 10 reps</span></div>
+            
+          </div>
+        <div style="padding:10px 14px;" id="del-wrap-4">
+          <button class="btn btn-ghost" style="font-size:11px;padding:8px 14px;color:var(--acc3);border-color:var(--acc3);" onclick="confirmDeleteLog(4)">Delete Entry</button>
+        </div>
+      </div>
+    </div>
+    <div class="log-day" id="logday-5">
+      <div class="log-day-hdr" onclick="toggleLogDay(5)">
+        <div>
+          <div class="log-date">Tue, Jun 9</div>
+          <div style="display:flex;gap:4px;margin-top:4px;">
+            <span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-chest"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-back"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-shoulders"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-biceps"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-triceps"></span>
+          </div>
+        </div>
+        <div class="log-stats">18 sets · 07:16 PM</div>
+      </div>
+      <div class="log-body">
+        
+          <div class="log-ex">
+            <div class="log-ex-name">Dumbbell Bench Press</div>
+            
+              <div class="log-set-row">Set 1: <span>45 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>50 lbs × 9 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>55 lbs × 7 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>55 lbs × 7 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Pull-Ups</div>
+            
+              <div class="log-set-row">Set 1: <span>25 lbs × 7 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>25 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>20 lbs × 7 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>20 lbs × 8 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Overhead Press (Bar)</div>
+            
+              <div class="log-set-row">Set 1: <span>75 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>80 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>85 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>90 lbs × 5 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Lat Pulldown</div>
+            
+              <div class="log-set-row">Set 1: <span>50 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>50 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>50 lbs × 8 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Dumbbell Curl</div>
+            
+              <div class="log-set-row">Set 1: <span>22.5 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>22.5 lbs × 10 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>22.5 lbs × 10 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Cable Pushdown</div>
+            
+          </div>
+        <div style="padding:10px 14px;" id="del-wrap-5">
+          <button class="btn btn-ghost" style="font-size:11px;padding:8px 14px;color:var(--acc3);border-color:var(--acc3);" onclick="confirmDeleteLog(5)">Delete Entry</button>
+        </div>
+      </div>
+    </div>
+    <div class="log-day" id="logday-6">
+      <div class="log-day-hdr" onclick="toggleLogDay(6)">
+        <div>
+          <div class="log-date">Thu, Jun 4</div>
+          <div style="display:flex;gap:4px;margin-top:4px;">
+            <span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-chest"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-back"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-shoulders"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-biceps"></span><span style="width:6px;height:6px;border-radius:50%;display:inline-block;" class="dot-triceps"></span>
+          </div>
+        </div>
+        <div class="log-stats">21 sets · 07:46 PM</div>
+      </div>
+      <div class="log-body">
+        
+          <div class="log-ex">
+            <div class="log-ex-name">Barbell Bench Press</div>
+            
+              <div class="log-set-row">Set 1: <span>95 lbs × 8 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>105 lbs × 8 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>115 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>120 lbs × 6 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Barbell Bent-Over Row</div>
+            
+              <div class="log-set-row">Set 1: <span>135 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>135 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>135 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>135 lbs × 6 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Overhead Press (Bar)</div>
+            
+              <div class="log-set-row">Set 1: <span>65 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>75 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>80 lbs × 6 reps</span></div>
+            
+              <div class="log-set-row">Set 4: <span>85 lbs × 5 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Lat Pulldown</div>
+            
+              <div class="log-set-row">Set 1: <span>42.5 lbs × 12 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>42.5 lbs × 11 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>42.5 lbs × 12 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Dumbbell Curl</div>
+            
+              <div class="log-set-row">Set 1: <span>22.5 lbs × 12 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>22.5 lbs × 12 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>22.5 lbs × 10 reps</span></div>
+            
+          </div>
+          <div class="log-ex">
+            <div class="log-ex-name">Cable Pushdown</div>
+            
+              <div class="log-set-row">Set 1: <span>30 lbs × 15 reps</span></div>
+            
+              <div class="log-set-row">Set 2: <span>35 lbs × 15 reps</span></div>
+            
+              <div class="log-set-row">Set 3: <span>45 lbs × 15 reps</span></div>
+            
+          </div>
+        <div style="padding:10px 14px;" id="del-wrap-6">
+          <button class="btn btn-ghost" style="font-size:11px;padding:8px 14px;color:var(--acc3);border-color:var(--acc3);" onclick="confirmDeleteLog(6)">Delete Entry</button>
+        </div>
+      </div>
+    </div></div>
     </div>
 
     <!-- AI COACH PAGE -->
     <div class="page" id="page-ai">
-      <div class="slabel">Weekly Schedule <span style="font-size:9px;color:var(--muted2);letter-spacing:0;text-transform:none;font-family:'DM Mono',monospace;">— tap a day to configure</span></div>
-      <div class="day-grid" id="ai-day-grid"></div>
+      <div class="slabel">Weekly Schedule <span style="font-size:9px;color:var(--muted2);letter-spacing:0;text-transform:none;font-family:&#39;DM Mono&#39;,monospace;">— tap a day to configure</span></div>
+      <div class="day-grid" id="ai-day-grid">
+    <div class="day-cell rest" onclick="openDayEditor(0)">
+      <div class="day-cell-name">Mon</div>
+      <span class="day-cell-icon">😴</span>
+    </div>
+    <div class="day-cell rest" onclick="openDayEditor(1)">
+      <div class="day-cell-name">Tue</div>
+      <span class="day-cell-icon">😴</span>
+    </div>
+    <div class="day-cell cf" onclick="openDayEditor(2)">
+      <div class="day-cell-name">Wed</div>
+      <span class="day-cell-icon">🏃</span>
+    </div>
+    <div class="day-cell rest" onclick="openDayEditor(3)">
+      <div class="day-cell-name">Thu</div>
+      <span class="day-cell-icon">😴</span>
+    </div>
+    <div class="day-cell rest" onclick="openDayEditor(4)">
+      <div class="day-cell-name">Fri</div>
+      <span class="day-cell-icon">😴</span>
+    </div>
+    <div class="day-cell rest" onclick="openDayEditor(5)">
+      <div class="day-cell-name">Sat</div>
+      <span class="day-cell-icon">😴</span>
+    </div>
+    <div class="day-cell rest" onclick="openDayEditor(6)">
+      <div class="day-cell-name">Sun</div>
+      <span class="day-cell-icon">😴</span>
+    </div></div>
 
       <div class="day-editor" id="day-editor">
         <div class="day-editor-title">
           <span id="day-editor-icon" style="font-size:20px;"></span>
           <span id="day-editor-title-text" style="flex:1;"></span>
-          <button onclick="closeDayEditor()" style="background:var(--s3);border:1px solid var(--border2);border-radius:6px;color:var(--muted2);font-size:12px;padding:4px 10px;cursor:pointer;font-family:'DM Mono',monospace;">✕ Close</button>
+          <button onclick="closeDayEditor()" style="background:var(--s3);border:1px solid var(--border2);border-radius:6px;color:var(--muted2);font-size:12px;padding:4px 10px;cursor:pointer;font-family:&#39;DM Mono&#39;,monospace;">✕ Close</button>
         </div>
         <div class="day-type-row">
-          <button class="day-type-btn" id="dtype-cf"   onclick="setDayType('crossfit')">🏃 CrossFit</button>
-          <button class="day-type-btn" id="dtype-gym"  onclick="setDayType('gym')">🏋️ Gym</button>
-          <button class="day-type-btn" id="dtype-rest" onclick="setDayType('rest')">😴 Rest</button>
+          <button class="day-type-btn" id="dtype-cf" onclick="setDayType(&#39;crossfit&#39;)">🏃 CrossFit</button>
+          <button class="day-type-btn" id="dtype-gym" onclick="setDayType(&#39;gym&#39;)">🏋️ Gym</button>
+          <button class="day-type-btn" id="dtype-rest" onclick="setDayType(&#39;rest&#39;)">😴 Rest</button>
         </div>
         <div id="wod-editor-wrap">
-          <textarea class="wod-textarea" id="wod-text" placeholder="Describe WOD movements, e.g: Fran — thrusters, pull-ups&#10;Leave blank if WOD is unknown"></textarea>
+          <textarea class="wod-textarea" id="wod-text" placeholder="Describe WOD movements, e.g: Fran — thrusters, pull-ups
+Leave blank if WOD is unknown"></textarea>
           <button class="btn btn-ghost" style="width:100%;margin-top:8px;font-size:12px;" onclick="saveDayEditor()">Save</button>
         </div>
         <button class="btn btn-ghost" style="width:100%;margin-top:6px;font-size:12px;" onclick="closeDayEditor()">Done ✓</button>
@@ -472,11 +1061,11 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
     <div class="page" id="page-settings" style="overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:40px;">
       <div class="slabel" style="margin-top:0;">Units</div>
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;">
-        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;margin-bottom:4px;">Weight Unit</div>
+        <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:14px;font-weight:800;margin-bottom:4px;">Weight Unit</div>
         <div style="font-size:10px;color:var(--muted2);margin-bottom:12px;">Weights are stored in lbs and converted automatically</div>
         <div style="display:flex;gap:8px;">
-          <button class="var-btn sel" id="unit-lbs" onclick="setWeightUnit('lbs')">🇺🇸 lbs</button>
-          <button class="var-btn" id="unit-kg" onclick="setWeightUnit('kg')">🌍 kg</button>
+          <button class="var-btn sel" id="unit-lbs" onclick="setWeightUnit(&#39;lbs&#39;)">🇺🇸 lbs</button>
+          <button class="var-btn" id="unit-kg" onclick="setWeightUnit(&#39;kg&#39;)">🌍 kg</button>
         </div>
       </div>
 
@@ -484,7 +1073,7 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
           <div>
-            <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;">Exercise Selection</div>
+            <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:14px;font-weight:800;">Exercise Selection</div>
             <div style="font-size:10px;color:var(--muted2);margin-top:2px;">How exercises are picked for your workouts</div>
           </div>
         </div>
@@ -536,8 +1125,8 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
   <div class="timer-pill">
     <div class="t-ring-wrap">
       <svg class="t-ring" viewBox="0 0 64 64">
-        <circle class="t-ring-bg" cx="32" cy="32" r="28"/>
-        <circle class="t-ring-prog" id="t-ring-prog" cx="32" cy="32" r="28"/>
+        <circle class="t-ring-bg" cx="32" cy="32" r="28"></circle>
+        <circle class="t-ring-prog" id="t-ring-prog" cx="32" cy="32" r="28"></circle>
       </svg>
       <div class="t-num" id="t-num">—</div>
     </div>
@@ -563,17 +1152,17 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
     <div id="swap-step-reason">
       <div style="font-size:10px;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Why are you swapping?</div>
       <div class="swap-reason-btns">
-        <button class="swap-reason-btn" onclick="swapPickReason('queue')">
+        <button class="swap-reason-btn" onclick="swapPickReason(&#39;queue&#39;)">
           <span class="reason-icon">⏳</span>
           <span class="reason-label">There's a queue</span>
           <span class="reason-desc">Swap just for today</span>
         </button>
-        <button class="swap-reason-btn" onclick="swapPickReason('noequip')">
+        <button class="swap-reason-btn" onclick="swapPickReason(&#39;noequip&#39;)">
           <span class="reason-icon">🚫</span>
           <span class="reason-label">No equipment</span>
           <span class="reason-desc">Never suggest this again</span>
         </button>
-        <button class="swap-reason-btn" onclick="swapPickReason('variety')">
+        <button class="swap-reason-btn" onclick="swapPickReason(&#39;variety&#39;)">
           <span class="reason-icon">🔀</span>
           <span class="reason-label">Want variety</span>
           <span class="reason-desc">Just trying something different</span>
@@ -744,7 +1333,6 @@ let swapTarget = null; // {dayIdx, itemIdx}
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   renderMuscleGrid();
-  updateHdrSessionTime();
   renderAIMuscleGrid();
   renderRoutinePreview();
   renderDayGrid();
@@ -770,6 +1358,26 @@ function switchPage(name) {
   else if (name !== 'session') releaseWakeLock();
   if (name === 'ml') runMLInsights();
   if (name === 'settings') initSettings();
+  updateHdrSessionDisplay(name);
+}
+
+function updateHdrSessionDisplay(name) {
+  const logo = document.getElementById('hdr-logo');
+  const date = document.getElementById('hdr-date');
+  const big = document.getElementById('hdr-session-big');
+  const small = document.getElementById('session-elapsed');
+  if (!logo || !date || !big) return;
+  if (name === 'session' && sessionStartTime) {
+    logo.classList.add('hide');
+    date.classList.add('hide');
+    big.classList.add('show');
+    if (small) small.style.display = 'none';
+  } else {
+    logo.classList.remove('hide');
+    date.classList.remove('hide');
+    big.classList.remove('show');
+    if (small && sessionStartTime) small.style.display = 'block';
+  }
 }
 
 // ═══════════════════════════════════════
@@ -1219,7 +1827,6 @@ async function saveWorkout() {
   showSaveConfirm();
   saveWorkoutSets(exercises, workoutDate);
   stopTimer();
-  updateHdrSessionTime();
   stopSessionTimer();
   clearSessionState();
   releaseWakeLock();
@@ -1339,14 +1946,12 @@ function keepAudioCtxAlive() {
 
 function startTimer(seconds, exName) {
   stopTimer();
-  updateHdrSessionTime();
   timerTotal = seconds; timerRemaining = seconds;
   timerEndTime = Date.now() + seconds * 1000;
   timerExName = exName;
   document.getElementById('t-exname').textContent = exName;
   document.getElementById('timer-overlay').classList.add('up');
   updateTimerDisplay();
-  updateHdrSessionTime();
   // Schedule system notification for when timer ends
   scheduleRestNotification(seconds, exName);
   // Keep AudioContext alive
@@ -1354,7 +1959,6 @@ function startTimer(seconds, exName) {
   timerInterval = setInterval(() => {
     timerRemaining = Math.max(0, Math.round((timerEndTime - Date.now()) / 1000));
     updateTimerDisplay();
-  updateHdrSessionTime();
     if (timerRemaining <= 0) {
       clearInterval(timerInterval); timerInterval = null;
       triggerAlarm();
@@ -1380,8 +1984,7 @@ function stopTimer() {
   document.getElementById('timer-overlay').classList.remove('up');
 }
 
-function skipTimer() { stopTimer();
-  updateHdrSessionTime(); }
+function skipTimer() { stopTimer(); }
 
 function adjustTimer(delta) {
   unlockAudio();
@@ -1389,7 +1992,6 @@ function adjustTimer(delta) {
   timerRemaining = Math.max(5, Math.round((timerEndTime - Date.now()) / 1000));
   if (timerRemaining > timerTotal) timerTotal = timerRemaining;
   updateTimerDisplay();
-  updateHdrSessionTime();
 }
 
 let _audioCtx = null;
@@ -1437,7 +2039,6 @@ function dismissAlarm() {
   unlockAudio();
   document.getElementById('alarm-overlay').classList.remove('active');
   stopTimer();
-  updateHdrSessionTime();
 }
 
 // ═══════════════════════════════════════
@@ -1784,13 +2385,17 @@ function startSessionTimer() {
   sessionStartTime = Date.now();
   const el = document.getElementById('session-elapsed');
   if (el) el.style.display = 'block';
+  updateHdrSessionDisplay(currentPageName());
   sessionElapsedInterval = setInterval(() => {
     if (!sessionStartTime) return;
     const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
     const m = Math.floor(elapsed / 60);
     const s = elapsed % 60;
+    const timeStr = m + ':' + String(s).padStart(2,'0');
     const el = document.getElementById('session-elapsed');
-    if (el) el.textContent = '⏱ ' + m + ':' + String(s).padStart(2,'0');
+    if (el) el.textContent = '⏱ ' + timeStr;
+    const big = document.getElementById('hdr-session-big');
+    if (big) big.textContent = timeStr;
   }, 1000);
 }
 
@@ -1799,6 +2404,12 @@ function stopSessionTimer() {
   if (sessionElapsedInterval) { clearInterval(sessionElapsedInterval); sessionElapsedInterval = null; }
   const el = document.getElementById('session-elapsed');
   if (el) el.style.display = 'none';
+  updateHdrSessionDisplay(currentPageName());
+}
+
+function currentPageName() {
+  const active = document.querySelector('.page.active');
+  return active ? active.id.replace('page-', '') : '';
 }
 
 function getLearnedExerciseTime(exerciseName, muscleKey) {
@@ -3037,5 +3648,6 @@ document.addEventListener('touchend', function(e) {
     <button id="save-confirm-btn" onclick="closeSaveConfirm()" style="display:none;width:100%;padding:12px;border-radius:11px;background:var(--acc);border:none;color:#08110a;font-weight:700;font-size:14px;cursor:pointer;">Done</button>
   </div>
 </div>
-</body>
-</html>
+
+
+</body></html>
